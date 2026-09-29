@@ -104,7 +104,7 @@ export default function Login() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => doLogin("member@rotarygwalior.org", "member123")}
+                  onClick={() => doLogin("alok.sharma@rotarygwalior.org", "member123")}
                   disabled={busy}
                   className="btn-ghost !px-3 !py-2.5 !text-xs"
                   data-testid="demo-member-login-button"

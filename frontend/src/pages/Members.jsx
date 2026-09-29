@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Lock, ArrowRight } from "lucide-react";
+import { Search, Lock, ArrowRight, PenLine } from "lucide-react";
 import { api } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import MemberModal from "../components/MemberModal";
+import MyProfileModal from "../components/MyProfileModal";
 import { Reveal } from "../components/Reveal";
 import { initialsOf } from "../components/Navbar";
 
@@ -45,12 +46,14 @@ export const Avatar = ({ member, size = "h-24 w-24" }) => (
 );
 
 export default function Members() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -59,7 +62,7 @@ export default function Members() {
       .then(({ data }) => setMembers(data))
       .catch(() => setMembers([]))
       .finally(() => setLoading(false));
-  }, [user?.id]);
+  }, [user?.id, reloadKey]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -89,9 +92,20 @@ export default function Members() {
               Distinguished Fellows &amp; <span className="royal-text">Innovators.</span>
             </h1>
             {user ? (
-              <p className="rounded-full border border-royal/30 bg-royal/10 px-4 py-2 text-xs font-semibold text-royal-light" data-testid="unlocked-banner">
-                Signed in — full biodata unlocked
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="rounded-full border border-royal/30 bg-royal/10 px-4 py-2 text-xs font-semibold text-royal-light" data-testid="unlocked-banner">
+                  Signed in — full biodata unlocked
+                </p>
+                {user.role !== "admin" && (
+                  <button
+                    onClick={() => setProfileOpen(true)}
+                    className="btn-ghost !px-4 !py-2 !text-xs"
+                    data-testid="edit-my-profile-button"
+                  >
+                    <PenLine size={13} /> Edit My Profile
+                  </button>
+                )}
+              </div>
             ) : (
               <p className="rounded-full border border-royal/25 bg-black/40 px-4 py-2 text-xs text-slate-400" data-testid="locked-banner">
                 <Lock size={12} className="mr-1.5 inline text-royal" />
@@ -175,6 +189,16 @@ export default function Members() {
           </div>
         )}
       </div>
+
+      {profileOpen && (
+        <MyProfileModal
+          onClose={() => setProfileOpen(false)}
+          onSaved={() => {
+            setReloadKey((k) => k + 1);
+            refresh();
+          }}
+        />
+      )}
 
       <AnimatePresence>
         {selected && <MemberModal member={selected} onClose={() => setSelected(null)} />}

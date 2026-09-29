@@ -341,6 +341,48 @@ async def change_password(body: ChangePasswordIn, user: dict = Depends(get_curre
     return {"ok": True}
 
 
+# ---- Member self-service profile ----
+
+MEMBER_SELF_FIELDS = ["name", "photo_url", "classification", "business", "bio",
+                      "phone", "address", "birthday", "anniversary", "spouse"]
+
+
+class MemberSelfIn(BaseModel):
+    name: str
+    photo_url: str = ""
+    classification: str = ""
+    business: str = ""
+    bio: str = ""
+    phone: str = ""
+    address: str = ""
+    birthday: str = ""
+    anniversary: str = ""
+    spouse: str = ""
+
+
+@api_router.get("/profile")
+async def get_my_profile(user: dict = Depends(get_current_user)):
+    member = await db.members.find_one({"email": user.get("email", "")})
+    if not member:
+        raise HTTPException(status_code=404, detail="No member profile is linked to this login")
+    return member_out(member, True)
+
+
+@api_router.put("/profile")
+async def update_my_profile(body: MemberSelfIn, user: dict = Depends(get_current_user)):
+    member = await db.members.find_one({"email": user.get("email", "")})
+    if not member:
+        raise HTTPException(status_code=404, detail="No member profile is linked to this login")
+    if not body.name.strip():
+        raise HTTPException(status_code=422, detail="Name is required")
+    updates = {f: getattr(body, f).strip() for f in MEMBER_SELF_FIELDS}
+    await db.members.update_one({"_id": member["_id"]}, {"$set": updates})
+    if updates["name"] != user.get("name"):
+        await db.users.update_one({"_id": user["_id"]}, {"$set": {"name": updates["name"]}})
+    doc = await db.members.find_one({"_id": member["_id"]})
+    return member_out(doc, True)
+
+
 # ---- Members (biodata with privacy gate) ----
 
 @api_router.get("/members")
@@ -699,11 +741,9 @@ async def seed():
                                    "name": "Admin", "role": "admin", "created_at": iso_now()})
         logger.info("Seeded admin user %s", admin_email)
 
-    member_email = "member@rotarygwalior.org"
-    if not await db.users.find_one({"email": member_email}):
-        await db.users.insert_one({"email": member_email, "password_hash": hash_password("member123"),
-                                   "name": "Rtn. Er. Alok Sharma", "role": "member", "created_at": iso_now()})
-        logger.info("Seeded demo member user %s", member_email)
+    # one-time cleanup: the old standalone demo user is replaced by Alok's real member login
+    await db.users.delete_one({"email": "member@rotarygwalior.org", "role": {"$ne": "admin"},
+                               "name": "Rtn. Er. Alok Sharma"})
 
     if await db.members.count_documents({}) == 0:
         await db.members.insert_many([dict(m, created_at=iso_now()) for m in SEED_MEMBERS])
@@ -729,11 +769,8 @@ async def seed():
             await db.users.update_one({"_id": admin["_id"]}, {"$set": updates})
             logger.info("Migrated admin login to username 'admin'")
 
-    # keep the demo member password stable for the demo login button
-    await db.members.update_one({"email": "alok.sharma@rotarygwalior.org"},
-                                {"$set": {"login_password": "member123"}})
-
     # every member with an email gets a login account whose password the admin can view
+    # (blank login_passwords get generated once; admin/member-changed passwords are never touched)
     async for m in db.members.find({"email": {"$exists": True, "$ne": ""}}):
         pwd = m.get("login_password") or gen_password()
         if not m.get("login_password"):
