@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform, useInView, animate } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, animate, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, ArrowDown, HeartPulse, BookOpen, Leaf, Briefcase,
-  Clock, MapPin, Mic2, Quote,
+  Clock, MapPin, Mic2, Quote, Maximize2,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api } from "../lib/api";
 import { photoSrcOf } from "../components/PhotoUpload";
+import Lightbox from "../components/Lightbox";
 import { Reveal, MaskedLine } from "../components/Reveal";
 import { Marquee } from "../components/Marquee";
 import { Logo, initialsOf } from "../components/Logo";
@@ -402,6 +403,7 @@ const Leadership = () => (
 
 const Gallery = () => {
   const [items, setItems] = useState([]);
+  const [lightbox, setLightbox] = useState(null);
   useEffect(() => {
     api
       .get("/gallery")
@@ -411,6 +413,7 @@ const Gallery = () => {
 
   if (items.length === 0) return null;
 
+  const shown = items.slice(0, 6);
   const spanFor = (i) =>
     i === 0 ? "col-span-2 row-span-2" : i === 3 || i === 5 ? "col-span-2" : "";
 
@@ -423,9 +426,13 @@ const Gallery = () => {
         </h2>
       </Reveal>
       <div className="mt-12 grid auto-rows-[150px] grid-flow-dense grid-cols-2 gap-4 sm:auto-rows-[190px] md:grid-cols-4">
-        {items.slice(0, 6).map((g, i) => (
+        {shown.map((g, i) => (
           <Reveal key={g.id} delay={i * 0.06} className={spanFor(i)}>
-            <figure className="group relative h-full w-full overflow-hidden rounded-xl border border-royal/20">
+            <button
+              onClick={() => setLightbox(i)}
+              className="group relative block h-full w-full cursor-zoom-in overflow-hidden rounded-xl border border-royal/20 transition-colors duration-300 hover:border-royal/60"
+              data-testid={`gallery-thumb-${i}`}
+            >
               <img
                 src={photoSrcOf(g.image_url)}
                 alt={g.caption || "Gallery moment"}
@@ -435,19 +442,32 @@ const Gallery = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
               {g.caption && (i === 0 || i === 3 || i === 5) && (
-                <figcaption className="absolute bottom-0 left-0 right-0 p-4">
-                  <p
+                <span className="absolute bottom-0 left-0 right-0 block p-4 text-left">
+                  <span
                     className="line-clamp-2 border-l-2 border-royal/60 pl-3 text-[11px] leading-relaxed text-slate-200 sm:text-sm"
                     data-testid={`gallery-caption-${i}`}
                   >
                     {g.caption}
-                  </p>
-                </figcaption>
+                  </span>
+                </span>
               )}
-            </figure>
+              <span className="absolute right-3 top-3 rounded-full border border-white/20 bg-black/50 p-2 text-white opacity-0 backdrop-blur transition-all duration-300 group-hover:opacity-100">
+                <Maximize2 size={14} />
+              </span>
+            </button>
           </Reveal>
         ))}
       </div>
+      <AnimatePresence>
+        {lightbox !== null && (
+          <Lightbox
+            items={shown}
+            index={lightbox}
+            onClose={() => setLightbox(null)}
+            onNavigate={setLightbox}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 };
