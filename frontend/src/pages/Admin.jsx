@@ -242,7 +242,7 @@ export default function Admin() {
                     <tr key={m.id} className="border-b border-royal/[0.08] transition-colors hover:bg-black/30" data-testid={`admin-member-row-${m.id}`}>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <Avatar member={m} size="h-10 w-10" />
+                          <Avatar member={m} size="h-10 w-10" initialsSize="text-xs" />
                           <div>
                             <p className="font-semibold text-slate-100">{m.name}</p>
                             <p className="text-xs text-royal/70">{m.role}</p>

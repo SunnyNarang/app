@@ -25,7 +25,7 @@ const FILTERS = [
   { id: "phf", label: "Paul Harris Fellows" },
 ];
 
-export const Avatar = ({ member, size = "h-24 w-24" }) => (
+export const Avatar = ({ member, size = "h-44 w-44", initialsSize = "text-4xl" }) => (
   <div
     className={`${size} shrink-0 overflow-hidden rounded-full ring-2 ring-royal/40 ring-offset-2 ring-offset-obsidian`}
   >
@@ -38,7 +38,7 @@ export const Avatar = ({ member, size = "h-24 w-24" }) => (
       />
     ) : (
       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-panel-hover to-panel">
-        <span className="royal-text font-display text-2xl font-bold">
+        <span className={`royal-text font-display font-bold ${initialsSize}`}>
           {initialsOf(member.name)}
         </span>
       </div>

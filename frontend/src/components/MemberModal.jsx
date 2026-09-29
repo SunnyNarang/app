@@ -59,7 +59,7 @@ export default function MemberModal({ member, onClose }) {
         <div className="grid gap-0 md:grid-cols-5">
           <div className="relative border-b border-royal/15 bg-black/30 p-8 text-center md:col-span-2 md:border-b-0 md:border-r">
             <div className="flex justify-center">
-              <Avatar member={member} size="h-32 w-32" />
+              <Avatar member={member} size="h-56 w-56" initialsSize="text-5xl" />
             </div>
             <h2 className="mt-6 font-display text-xl font-bold leading-snug" data-testid="biodata-name">
               {member.name}
