@@ -357,9 +357,8 @@ const LEADERS = [
 const Leadership = () => {
   const [leaders, setLeaders] = useState([]);
   useEffect(() => {
-    api
-      .get("/members")
-      .then(({ data }) => {
+    Promise.all([api.get("/core-team"), api.get("/members")])
+      .then(([{ data: ct }, { data: members }]) => {
         const slots = [
           { key: "president", label: "Club President", match: (r) => r.includes("president") && !r.includes("past") },
           { key: "secretary", label: "Club Secretary", match: (r) => r.includes("secretary") && !r.includes("past") },
@@ -367,9 +366,11 @@ const Leadership = () => {
         ];
         const picked = slots
           .map((slot) => {
-            const active = data.find((m) => slot.match((m.role || "").toLowerCase()));
+            const chosen = ct[slot.key];
+            if (chosen && chosen.id) return { key: slot.key, label: slot.label, member: chosen };
+            const active = members.find((m) => slot.match((m.role || "").toLowerCase()));
             if (active) return { ...slot, member: active };
-            const past = data.find((m) => (m.role || "").toLowerCase().includes(slot.key));
+            const past = members.find((m) => (m.role || "").toLowerCase().includes(slot.key));
             return past ? { ...slot, label: `Past ${slot.label}`, member: past } : null;
           })
           .filter(Boolean);

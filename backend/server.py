@@ -771,6 +771,47 @@ async def delete_application(app_id: str):
     return {"ok": True}
 
 
+# ---- Core team (home page leadership tiles) ----
+
+class CoreTeamIn(BaseModel):
+    president_id: str = ""
+    secretary_id: str = ""
+    treasurer_id: str = ""
+
+
+@api_router.get("/core-team")
+async def get_core_team():
+    doc = await db.club_settings.find_one({"key": "core_team"})
+    ids = (doc or {}).get("core_team", {})
+    out = {}
+    for role in ["president", "secretary", "treasurer"]:
+        mid = ids.get(role) or ""
+        member = None
+        if mid:
+            try:
+                member = await db.members.find_one({"_id": ObjectId(mid)})
+            except Exception:
+                member = None
+        out[role] = member_out(member, False) if member else None
+    return out
+
+
+@api_router.put("/core-team", dependencies=[Depends(require_admin)])
+async def set_core_team(body: CoreTeamIn):
+    update = {}
+    for role in ["president", "secretary", "treasurer"]:
+        mid = getattr(body, f"{role}_id").strip()
+        if mid:
+            member = await db.members.find_one({"_id": to_oid(mid)})
+            if not member:
+                raise HTTPException(status_code=404, detail=f"Member not found for {role}")
+            update[f"core_team.{role}"] = str(member["_id"])
+        else:
+            update[f"core_team.{role}"] = ""
+    await db.club_settings.update_one({"key": "core_team"}, {"$set": update}, upsert=True)
+    return {"ok": True}
+
+
 # ---- Admin stats ----
 
 @api_router.get("/admin/stats", dependencies=[Depends(require_admin)])

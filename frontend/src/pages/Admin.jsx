@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
   Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound,
-  Image as ImageIcon, ChevronUp, ChevronDown, UserPlus, Phone, MapPin, Briefcase,
+  Image as ImageIcon, ChevronUp, ChevronDown, UserPlus, Phone, MapPin, Briefcase, Award,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api, formatApiErrorDetail } from "../lib/api";
@@ -14,11 +14,14 @@ import { Avatar } from "./Members";
 
 const TABS = [
   { id: "members", label: "Members", icon: Users },
+  { id: "coreteam", label: "Core Team", icon: Award },
   { id: "meetings", label: "Meetings & Schedule", icon: CalendarDays },
   { id: "projects", label: "Service Projects", icon: HeartHandshake },
   { id: "gallery", label: "Gallery", icon: ImageIcon },
   { id: "applications", label: "Applications", icon: UserPlus },
 ];
+
+const CORE_LABELS = { president: "Club President", secretary: "Club Secretary", treasurer: "Treasurer" };
 
 const Field = ({ label, children }) => (
   <label className="block">
@@ -98,6 +101,8 @@ export default function Admin() {
   const [galleryItems, setGalleryItems] = useState([]);
   const [galleryForm, setGalleryForm] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [coreTeam, setCoreTeam] = useState({ president_id: "", secretary_id: "", treasurer_id: "" });
+  const [savingTeam, setSavingTeam] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const loadAll = async () => {
@@ -176,6 +181,35 @@ export default function Admin() {
       setSaving(false);
       setProjectForm(null);
     });
+  };
+
+  const loadCoreTeam = async () => {
+    try {
+      const { data } = await api.get("/core-team");
+      setCoreTeam({
+        president_id: data.president?.id || "",
+        secretary_id: data.secretary?.id || "",
+        treasurer_id: data.treasurer?.id || "",
+      });
+    } catch {
+      setCoreTeam({ president_id: "", secretary_id: "", treasurer_id: "" });
+    }
+  };
+
+  useEffect(() => {
+    loadCoreTeam();
+  }, []);
+
+  const saveCoreTeam = async () => {
+    setSavingTeam(true);
+    try {
+      await api.put("/core-team", coreTeam);
+      toast.success("Core team saved — home page updated");
+    } catch (e) {
+      toast.error(formatApiErrorDetail(e.response?.data?.detail) || "Could not save core team");
+    } finally {
+      setSavingTeam(false);
+    }
   };
 
   const moveGallery = async (id, direction) => {
@@ -324,6 +358,42 @@ export default function Admin() {
         )}
 
         {/* MEETINGS TAB */}
+        {tab === "coreteam" && (
+          <section className="mt-8 max-w-3xl">
+            <p className="mb-6 text-xs leading-relaxed text-slate-400" data-testid="core-team-hint">
+              <span className="font-semibold text-royal-light">Tip:</span> pick who serves as President, Secretary and
+              Treasurer for the year — the home page tiles update instantly. Leave a slot as{" "}
+              <span className="text-royal-light">Not set</span> to auto-detect it from member roles.
+            </p>
+            <div className="glass-card space-y-5 p-6 sm:p-8">
+              {["president", "secretary", "treasurer"].map((role) => (
+                <label key={role} className="block">
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    {CORE_LABELS[role]}
+                  </span>
+                  <select
+                    className="input-dark"
+                    value={coreTeam[`${role}_id`]}
+                    onChange={(e) => setCoreTeam({ ...coreTeam, [`${role}_id`]: e.target.value })}
+                    data-testid={`core-team-select-${role}`}
+                  >
+                    <option value="" className="bg-panel">— Not set (auto-detect from roles) —</option>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id} className="bg-panel">
+                        {m.name} — {m.role || "member"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+              <button onClick={saveCoreTeam} disabled={savingTeam} className="btn-royal w-full" data-testid="core-team-save">
+                {savingTeam ? <Loader2 size={16} className="animate-spin" /> : null}
+                Save Core Team
+              </button>
+            </div>
+          </section>
+        )}
+
         {tab === "meetings" && (
           <section className="mt-8">
             <div className="mb-6 flex justify-end">
