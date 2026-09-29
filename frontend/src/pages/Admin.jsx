@@ -464,7 +464,13 @@ export default function Admin() {
                   </select>
                 </Field>
                 <Field label="Date"><input type="date" className="input-dark" value={projectForm.date} onChange={(e) => setProjectForm({ ...projectForm, date: e.target.value })} data-testid="project-form-date" /></Field>
-                <Field label="Image URL"><input className="input-dark" value={projectForm.image_url} onChange={(e) => setProjectForm({ ...projectForm, image_url: e.target.value })} data-testid="project-form-image" /></Field>
+                <div className="sm:col-span-2 rounded-lg border border-royal/15 bg-black/30 p-4" data-testid="project-photo-upload-section">
+                  <PhotoUpload
+                    value={projectForm.image_url}
+                    onChange={(url) => setProjectForm({ ...projectForm, image_url: url })}
+                    testIdPrefix="project-photo-upload"
+                  />
+                </div>
                 <Field label="Volunteers"><input type="number" className="input-dark" value={projectForm.volunteers} onChange={(e) => setProjectForm({ ...projectForm, volunteers: e.target.value })} data-testid="project-form-volunteers" /></Field>
                 <Field label="Service Hours"><input type="number" className="input-dark" value={projectForm.hours} onChange={(e) => setProjectForm({ ...projectForm, hours: e.target.value })} data-testid="project-form-hours" /></Field>
                 <Field label="Lives Impacted"><input type="number" className="input-dark" value={projectForm.lives_impacted} onChange={(e) => setProjectForm({ ...projectForm, lives_impacted: e.target.value })} data-testid="project-form-lives" /></Field>

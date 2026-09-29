@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api } from "../lib/api";
+import { photoSrcOf } from "../components/PhotoUpload";
 import { Reveal, MaskedLine } from "../components/Reveal";
 import { Marquee } from "../components/Marquee";
 import { Logo, initialsOf } from "../components/Logo";
@@ -399,6 +400,52 @@ const Leadership = () => (
   </section>
 );
 
+const Gallery = () => {
+  const [projects, setProjects] = useState([]);
+  useEffect(() => {
+    api
+      .get("/projects")
+      .then(({ data }) => setProjects(data.filter((p) => p.image_url)))
+      .catch(() => setProjects([]));
+  }, []);
+
+  if (projects.length === 0) return null;
+
+  const spanFor = (i) =>
+    i === 0 ? "col-span-2 row-span-2" : i === 3 || i === 5 ? "col-span-2" : "";
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 sm:pb-32" data-testid="home-gallery">
+      <Reveal>
+        <p className="eyebrow mb-4">Gallery</p>
+        <h2 className="font-display text-2xl font-bold sm:text-3xl lg:text-4xl">
+          Moments from our <span className="royal-text">service.</span>
+        </h2>
+      </Reveal>
+      <div className="mt-12 grid auto-rows-[150px] grid-flow-dense grid-cols-2 gap-4 sm:auto-rows-[190px] md:grid-cols-4">
+        {projects.slice(0, 6).map((p, i) => (
+          <Reveal key={p.id} delay={i * 0.06} className={spanFor(i)}>
+            <figure className="group relative h-full w-full overflow-hidden rounded-xl border border-royal/20">
+              <img
+                src={photoSrcOf(p.image_url)}
+                alt={p.title}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                loading="lazy"
+                data-testid={`gallery-photo-${i}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+              <figcaption className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-sm font-bold text-slate-100">{p.title}</p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-royal-light">{p.category}</p>
+              </figcaption>
+            </figure>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 const JoinBand = () => (
   <section className="relative overflow-hidden border-t border-royal/20 bg-black/40">
     <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-20 text-center sm:px-6 sm:py-28">
@@ -434,6 +481,7 @@ export default function Home() {
       <Impact />
       <Schedule />
       <Leadership />
+      <Gallery />
       <JoinBand />
     </main>
   );
