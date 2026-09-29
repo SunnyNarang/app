@@ -11,7 +11,7 @@ const ITEMS = [
 
 export const Marquee = () => (
   <div
-    className="relative overflow-hidden border-y border-gold/20 bg-black/40 py-5"
+    className="relative overflow-hidden border-y border-royal/20 bg-black/40 py-5"
     data-testid="home-marquee"
   >
     <div className="flex w-max animate-marquee">
@@ -24,7 +24,7 @@ export const Marquee = () => (
           {ITEMS.map((item) => (
             <span
               key={`${dup}-${item}`}
-              className="flex items-center gap-10 pr-10 font-display text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-gold-light/80"
+              className="flex items-center gap-10 pr-10 font-display text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-royal-light/80"
             >
               {item}
               <Logo size={18} />

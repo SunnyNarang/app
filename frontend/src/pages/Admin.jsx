@@ -36,12 +36,12 @@ const Modal = ({ title, onClose, children }) => (
       exit={{ y: 30, opacity: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       onClick={(e) => e.stopPropagation()}
-      className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-gold/25 bg-panel p-6 sm:p-8"
+      className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-royal/25 bg-panel p-6 sm:p-8"
       data-testid="admin-modal"
     >
       <div className="mb-6 flex items-center justify-between">
-        <h3 className="font-display text-xl font-bold text-gold-light">{title}</h3>
-        <button onClick={onClose} className="rounded-full border border-gold/30 p-2 text-gold hover:bg-gold hover:text-black" data-testid="admin-modal-close">
+        <h3 className="font-display text-xl font-bold text-royal-light">{title}</h3>
+        <button onClick={onClose} className="rounded-full border border-royal/30 p-2 text-royal hover:bg-royal hover:text-black" data-testid="admin-modal-close">
           <X size={16} />
         </button>
       </div>
@@ -63,7 +63,7 @@ const DeleteButton = ({ onConfirm, testId }) => {
       onClick={() => (armed ? onConfirm() : setArmed(true))}
       onBlur={() => setArmed(false)}
       className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all ${
-        armed ? "border-red-500 bg-red-500/20 text-red-300" : "border-gold/25 text-slate-400 hover:border-red-500/50 hover:text-red-300"
+        armed ? "border-red-500 bg-red-500/20 text-red-300" : "border-royal/25 text-slate-400 hover:border-red-500/50 hover:text-red-300"
       }`}
       data-testid={testId}
     >
@@ -158,10 +158,10 @@ export default function Admin() {
   return (
     <main className="min-h-screen bg-obsidian pb-24 pt-28 sm:pt-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
+        <Reveal mount>
           <p className="eyebrow mb-3">Admin Portal</p>
           <h1 className="flex items-center gap-3 font-display text-3xl font-bold sm:text-4xl">
-            <LayoutDashboard className="text-gold" /> Club Command Center
+            <LayoutDashboard className="text-royal" /> Club Command Center
           </h1>
         </Reveal>
 
@@ -173,13 +173,13 @@ export default function Admin() {
             ["Portal Users", stats?.users, "admin-stat-users"],
           ].map(([label, val, id]) => (
             <div key={label} className="glass-card p-5" data-testid={id}>
-              <p className="gold-text font-display text-3xl font-bold">{val ?? "—"}</p>
+              <p className="royal-text font-display text-3xl font-bold">{val ?? "—"}</p>
               <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">{label}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-2 border-b border-gold/15 pb-4">
+        <div className="mt-10 flex flex-wrap gap-2 border-b border-royal/15 pb-4">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -187,8 +187,8 @@ export default function Admin() {
               data-testid={`admin-tab-${t.id}`}
               className={`inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 tab === t.id
-                  ? "bg-gold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)]"
-                  : "border border-gold/25 text-slate-300 hover:border-gold/60 hover:text-gold-light"
+                  ? "bg-royal text-white shadow-[0_0_20px_rgba(65,105,225,0.35)]"
+                  : "border border-royal/25 text-slate-300 hover:border-royal/60 hover:text-royal-light"
               }`}
             >
               <t.icon size={16} /> {t.label}
@@ -200,14 +200,14 @@ export default function Admin() {
         {tab === "members" && (
           <section className="mt-8">
             <div className="mb-6 flex justify-end">
-              <button onClick={() => setMemberForm({ ...EMPTY_MEMBER })} className="btn-gold !px-4 !py-2.5 !text-xs" data-testid="admin-add-member-button">
+              <button onClick={() => setMemberForm({ ...EMPTY_MEMBER })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-member-button">
                 <Plus size={15} /> Add New Member
               </button>
             </div>
             <div className="glass-card overflow-x-auto">
               <table className="w-full min-w-[760px] text-left text-sm" data-testid="admin-members-table">
                 <thead>
-                  <tr className="border-b border-gold/15 text-xs uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-royal/15 text-xs uppercase tracking-wider text-slate-400">
                     <th className="px-5 py-4">Member</th>
                     <th className="px-5 py-4">Classification</th>
                     <th className="px-5 py-4">Phone (private)</th>
@@ -217,13 +217,13 @@ export default function Admin() {
                 </thead>
                 <tbody>
                   {members.map((m) => (
-                    <tr key={m.id} className="border-b border-gold/[0.08] transition-colors hover:bg-black/30" data-testid={`admin-member-row-${m.id}`}>
+                    <tr key={m.id} className="border-b border-royal/[0.08] transition-colors hover:bg-black/30" data-testid={`admin-member-row-${m.id}`}>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <Avatar member={m} size="h-10 w-10" />
                           <div>
                             <p className="font-semibold text-slate-100">{m.name}</p>
-                            <p className="text-xs text-gold/70">{m.role}</p>
+                            <p className="text-xs text-royal/70">{m.role}</p>
                           </div>
                         </div>
                       </td>
@@ -231,14 +231,14 @@ export default function Admin() {
                       <td className="px-5 py-4 font-mono text-xs text-slate-300">{m.phone || "—"}</td>
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap gap-1.5">
-                          {m.board_member && <span className="rounded border border-gold/30 px-2 py-0.5 text-[10px] text-gold">Board</span>}
-                          {m.past_president && <span className="rounded border border-gold/30 px-2 py-0.5 text-[10px] text-gold">Past Pres.</span>}
-                          {m.paul_harris && <span className="rounded border border-gold/30 px-2 py-0.5 text-[10px] text-gold">PHF</span>}
+                          {m.board_member && <span className="rounded border border-royal/30 px-2 py-0.5 text-[10px] text-royal">Board</span>}
+                          {m.past_president && <span className="rounded border border-royal/30 px-2 py-0.5 text-[10px] text-royal">Past Pres.</span>}
+                          {m.paul_harris && <span className="rounded border border-royal/30 px-2 py-0.5 text-[10px] text-royal">PHF</span>}
                         </div>
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => setMemberForm({ ...m })} className="inline-flex items-center gap-1 rounded-lg border border-gold/25 px-3 py-1.5 text-xs font-semibold text-gold-light transition-all hover:border-gold hover:bg-gold/10" data-testid={`admin-edit-member-${m.id}`}>
+                          <button onClick={() => setMemberForm({ ...m })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light transition-all hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-member-${m.id}`}>
                             <Pencil size={13} /> Edit
                           </button>
                           <DeleteButton
@@ -259,7 +259,7 @@ export default function Admin() {
         {tab === "meetings" && (
           <section className="mt-8">
             <div className="mb-6 flex justify-end">
-              <button onClick={() => setMeetingForm({ title: "", date: dayjs().add(7, "day").format("YYYY-MM-DD"), time: "7:00 PM", venue: "", kind: "fellowship", speaker: "", topic: "", description: "" })} className="btn-gold !px-4 !py-2.5 !text-xs" data-testid="admin-add-meeting-button">
+              <button onClick={() => setMeetingForm({ title: "", date: dayjs().add(7, "day").format("YYYY-MM-DD"), time: "7:00 PM", venue: "", kind: "fellowship", speaker: "", topic: "", description: "" })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-meeting-button">
                 <Plus size={15} /> Add Meeting / Event
               </button>
             </div>
@@ -267,14 +267,14 @@ export default function Admin() {
               {meetings.map((m) => (
                 <div key={m.id} className="glass-card flex items-start justify-between gap-4 p-5" data-testid={`admin-meeting-row-${m.id}`}>
                   <div>
-                    <p className="font-mono text-xs text-gold">{dayjs(m.date).format("ddd, DD MMM YYYY")} · {m.time}</p>
+                    <p className="font-mono text-xs text-royal">{dayjs(m.date).format("ddd, DD MMM YYYY")} · {m.time}</p>
                     <p className="mt-1.5 font-display text-base font-bold">{m.title}</p>
                     <p className="mt-1 text-xs text-slate-400">{m.venue}</p>
-                    {m.speaker && <p className="mt-2 text-xs text-gold-light">{m.speaker} — <span className="text-slate-400">{m.topic}</span></p>}
-                    <span className="mt-3 inline-block rounded-full border border-gold/25 px-2.5 py-0.5 text-[10px] uppercase tracking-widest text-gold/80">{m.kind}</span>
+                    {m.speaker && <p className="mt-2 text-xs text-royal-light">{m.speaker} — <span className="text-slate-400">{m.topic}</span></p>}
+                    <span className="mt-3 inline-block rounded-full border border-royal/25 px-2.5 py-0.5 text-[10px] uppercase tracking-widest text-royal/80">{m.kind}</span>
                   </div>
                   <div className="flex shrink-0 flex-col gap-2">
-                    <button onClick={() => setMeetingForm({ ...m })} className="inline-flex items-center gap-1 rounded-lg border border-gold/25 px-3 py-1.5 text-xs font-semibold text-gold-light hover:border-gold hover:bg-gold/10" data-testid={`admin-edit-meeting-${m.id}`}>
+                    <button onClick={() => setMeetingForm({ ...m })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-meeting-${m.id}`}>
                       <Pencil size={13} /> Edit
                     </button>
                     <DeleteButton testId={`admin-delete-meeting-${m.id}`} onConfirm={() => mutate(() => api.delete(`/meetings/${m.id}`), "Meeting removed")} />
@@ -289,7 +289,7 @@ export default function Admin() {
         {tab === "projects" && (
           <section className="mt-8">
             <div className="mb-6 flex justify-end">
-              <button onClick={() => setProjectForm({ title: "", description: "", category: "", image_url: "", status: "active", volunteers: 0, hours: 0, lives_impacted: 0, date: dayjs().format("YYYY-MM-DD") })} className="btn-gold !px-4 !py-2.5 !text-xs" data-testid="admin-add-project-button">
+              <button onClick={() => setProjectForm({ title: "", description: "", category: "", image_url: "", status: "active", volunteers: 0, hours: 0, lives_impacted: 0, date: dayjs().format("YYYY-MM-DD") })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-project-button">
                 <Plus size={15} /> Add Project
               </button>
             </div>
@@ -298,19 +298,19 @@ export default function Admin() {
                 <div key={p.id} className="glass-card overflow-hidden" data-testid={`admin-project-row-${p.id}`}>
                   <div className="relative h-36">
                     <img src={p.image_url} alt={p.title} className="h-full w-full object-cover" />
-                    <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${p.status === "active" ? "bg-emerald-500/90 text-black" : "bg-gold/90 text-black"}`}>
+                    <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${p.status === "active" ? "bg-emerald-500/90 text-black" : "bg-royal/90 text-white"}`}>
                       {p.status}
                     </span>
                   </div>
                   <div className="p-5">
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-gold/70">{p.category}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-royal/70">{p.category}</p>
                     <p className="mt-1.5 font-display text-base font-bold">{p.title}</p>
                     <p className="mt-2 line-clamp-2 text-xs text-slate-400">{p.description}</p>
-                    <p className="mt-3 font-mono text-xs text-gold-light">
+                    <p className="mt-3 font-mono text-xs text-royal-light">
                       {p.volunteers} volunteers · {p.hours} hrs · {p.lives_impacted.toLocaleString("en-IN")} lives
                     </p>
                     <div className="mt-4 flex gap-2">
-                      <button onClick={() => setProjectForm({ ...p })} className="inline-flex items-center gap-1 rounded-lg border border-gold/25 px-3 py-1.5 text-xs font-semibold text-gold-light hover:border-gold hover:bg-gold/10" data-testid={`admin-edit-project-${p.id}`}>
+                      <button onClick={() => setProjectForm({ ...p })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-project-${p.id}`}>
                         <Pencil size={13} /> Edit
                       </button>
                       <DeleteButton testId={`admin-delete-project-${p.id}`} onConfirm={() => mutate(() => api.delete(`/projects/${p.id}`), "Project removed")} />
@@ -350,10 +350,10 @@ export default function Admin() {
               <Field label="Bio">
                 <textarea rows={3} className="input-dark" value={memberForm.bio} onChange={(e) => setMemberForm({ ...memberForm, bio: e.target.value })} data-testid="member-form-bio" />
               </Field>
-              <div className="flex flex-wrap gap-5 rounded-lg border border-gold/15 bg-black/30 p-4">
+              <div className="flex flex-wrap gap-5 rounded-lg border border-royal/15 bg-black/30 p-4">
                 {[["board_member", "Board Member"], ["past_president", "Past President"], ["paul_harris", "Paul Harris Fellow"]].map(([k, label]) => (
                   <label key={k} className="flex items-center gap-2 text-sm text-slate-300">
-                    <input type="checkbox" checked={!!memberForm[k]} onChange={(e) => setMemberForm({ ...memberForm, [k]: e.target.checked })} className="h-4 w-4 accent-[#D4AF37]" data-testid={`member-form-${k}`} />
+                    <input type="checkbox" checked={!!memberForm[k]} onChange={(e) => setMemberForm({ ...memberForm, [k]: e.target.checked })} className="h-4 w-4 accent-[#4169E1]" data-testid={`member-form-${k}`} />
                     {label}
                   </label>
                 ))}
@@ -367,7 +367,7 @@ export default function Admin() {
                 <Field label="Anniversary"><input className="input-dark" value={memberForm.anniversary} onChange={(e) => setMemberForm({ ...memberForm, anniversary: e.target.value })} data-testid="member-form-anniversary" /></Field>
                 <Field label="Spouse Name"><input className="input-dark" value={memberForm.spouse} onChange={(e) => setMemberForm({ ...memberForm, spouse: e.target.value })} data-testid="member-form-spouse" /></Field>
               </div>
-              <button type="submit" disabled={saving} className="btn-gold w-full" data-testid="member-form-submit">
+              <button type="submit" disabled={saving} className="btn-royal w-full" data-testid="member-form-submit">
                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
                 {memberForm.id ? "Save Changes" : "Add Member"}
               </button>
@@ -392,7 +392,7 @@ export default function Admin() {
                 </Field>
               </div>
               <Field label="Description"><textarea rows={3} className="input-dark" value={meetingForm.description} onChange={(e) => setMeetingForm({ ...meetingForm, description: e.target.value })} data-testid="meeting-form-description" /></Field>
-              <button type="submit" disabled={saving} className="btn-gold w-full" data-testid="meeting-form-submit">
+              <button type="submit" disabled={saving} className="btn-royal w-full" data-testid="meeting-form-submit">
                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
                 {meetingForm.id ? "Save Changes" : "Add Meeting"}
               </button>
@@ -418,7 +418,7 @@ export default function Admin() {
                 <Field label="Lives Impacted"><input type="number" className="input-dark" value={projectForm.lives_impacted} onChange={(e) => setProjectForm({ ...projectForm, lives_impacted: e.target.value })} data-testid="project-form-lives" /></Field>
               </div>
               <Field label="Description"><textarea rows={3} className="input-dark" value={projectForm.description} onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })} data-testid="project-form-description" /></Field>
-              <button type="submit" disabled={saving} className="btn-gold w-full" data-testid="project-form-submit">
+              <button type="submit" disabled={saving} className="btn-royal w-full" data-testid="project-form-submit">
                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
                 {projectForm.id ? "Save Changes" : "Add Project"}
               </button>

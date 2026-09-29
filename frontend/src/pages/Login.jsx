@@ -33,17 +33,17 @@ export default function Login() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-obsidian px-4 py-32">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/10 blur-[140px]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal/10 blur-[140px]" />
       <motion.div
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full max-w-md"
       >
-        <div className="animate-gold-pan rounded-2xl bg-[linear-gradient(120deg,#F3E5AB,#D4AF37,#996515,#F3E5AB)] bg-[length:300%_300%] p-[1.5px]">
+        <div className="animate-royal-pan rounded-2xl bg-[linear-gradient(120deg,#C7D9FF,#4169E1,#1E3A8A,#C7D9FF)] bg-[length:300%_300%] p-[1.5px]">
           <div className="rounded-2xl bg-panel p-8 sm:p-10">
             <div className="flex flex-col items-center text-center">
-              <Logo size={52} className="drop-shadow-[0_0_16px_rgba(212,175,55,0.4)]" />
+              <Logo size={52} className="drop-shadow-[0_0_16px_rgba(65,105,225,0.5)]" />
               <h1 className="mt-5 font-display text-2xl font-bold" data-testid="login-heading">
                 Member &amp; Admin Portal
               </h1>
@@ -84,7 +84,7 @@ export default function Login() {
                   {error}
                 </p>
               )}
-              <button type="submit" disabled={busy} className="btn-gold w-full" data-testid="login-submit-button">
+              <button type="submit" disabled={busy} className="btn-royal w-full" data-testid="login-submit-button">
                 {busy ? (
                   <>
                     <Loader2 size={17} className="animate-spin" /> Signing in…
@@ -97,7 +97,7 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="mt-8 rounded-xl border border-gold/20 bg-black/30 p-4">
+            <div className="mt-8 rounded-xl border border-royal/20 bg-black/30 p-4">
               <p className="mb-3 text-center text-[10px] uppercase tracking-[0.25em] text-slate-500">
                 Quick demo access
               </p>
@@ -123,7 +123,7 @@ export default function Login() {
 
             <p className="mt-6 text-center text-xs text-slate-500">
               Not a member yet?{" "}
-              <Link to="/members" className="text-gold hover:text-gold-light">
+              <Link to="/members" className="text-royal hover:text-royal-light">
                 Browse the public directory
               </Link>
             </p>

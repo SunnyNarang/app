@@ -25,7 +25,7 @@ const FILTERS = [
 
 export const Avatar = ({ member, size = "h-24 w-24" }) => (
   <div
-    className={`${size} shrink-0 overflow-hidden rounded-full ring-2 ring-gold/40 ring-offset-2 ring-offset-obsidian`}
+    className={`${size} shrink-0 overflow-hidden rounded-full ring-2 ring-royal/40 ring-offset-2 ring-offset-obsidian`}
   >
     {member.photo_url ? (
       <img
@@ -36,7 +36,7 @@ export const Avatar = ({ member, size = "h-24 w-24" }) => (
       />
     ) : (
       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-panel-hover to-panel">
-        <span className="gold-text font-display text-2xl font-bold">
+        <span className="royal-text font-display text-2xl font-bold">
           {initialsOf(member.name)}
         </span>
       </div>
@@ -82,29 +82,29 @@ export default function Members() {
   return (
     <main className="min-h-screen bg-obsidian pb-28 pt-28 sm:pt-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Reveal>
+        <Reveal mount>
           <p className="eyebrow mb-4">The Directory</p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <h1 className="font-display text-3xl font-bold leading-tight sm:text-5xl">
-              Distinguished Fellows &amp; <span className="gold-text">Innovators.</span>
+              Distinguished Fellows &amp; <span className="royal-text">Innovators.</span>
             </h1>
             {user ? (
-              <p className="rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-xs font-semibold text-gold-light" data-testid="unlocked-banner">
+              <p className="rounded-full border border-royal/30 bg-royal/10 px-4 py-2 text-xs font-semibold text-royal-light" data-testid="unlocked-banner">
                 Signed in — full biodata unlocked
               </p>
             ) : (
-              <p className="rounded-full border border-gold/25 bg-black/40 px-4 py-2 text-xs text-slate-400" data-testid="locked-banner">
-                <Lock size={12} className="mr-1.5 inline text-gold" />
+              <p className="rounded-full border border-royal/25 bg-black/40 px-4 py-2 text-xs text-slate-400" data-testid="locked-banner">
+                <Lock size={12} className="mr-1.5 inline text-royal" />
                 Personal details are members-only
               </p>
             )}
           </div>
         </Reveal>
 
-        <Reveal delay={0.1}>
+        <Reveal mount delay={0.1}>
           <div className="mt-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full max-w-md">
-              <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/60" />
+              <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-royal/60" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -121,8 +121,8 @@ export default function Members() {
                   data-testid={`member-filter-${f.id}`}
                   className={`rounded-full border px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-300 ${
                     filter === f.id
-                      ? "border-gold bg-gold text-black shadow-[0_0_18px_rgba(212,175,55,0.3)]"
-                      : "border-gold/25 text-slate-300 hover:border-gold/60 hover:text-gold-light"
+                      ? "border-royal bg-royal text-white shadow-[0_0_18px_rgba(65,105,225,0.35)]"
+                      : "border-royal/25 text-slate-300 hover:border-royal/60 hover:text-royal-light"
                   }`}
                 >
                   {f.label}
@@ -142,8 +142,7 @@ export default function Members() {
               <motion.button
                 key={m.id}
                 initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: (i % 4) * 0.07, ease: [0.22, 1, 0.36, 1] }}
                 onClick={() => setSelected(m)}
                 data-testid={`member-card-${slugOf(m.name)}`}
@@ -154,17 +153,17 @@ export default function Members() {
                   {m.name}
                 </h3>
                 {m.role && (
-                  <span className="mt-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold-light">
+                  <span className="mt-2 rounded-full border border-royal/30 bg-royal/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-royal-light">
                     {m.role}
                   </span>
                 )}
-                <p className="mt-3 font-mono text-xs text-gold/70">{m.classification}</p>
+                <p className="mt-3 font-mono text-xs text-royal/70">{m.classification}</p>
                 {m.business && <p className="mt-1 text-xs text-slate-500">{m.business}</p>}
-                <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-gold opacity-0 transition-all duration-300 group-hover:opacity-100">
+                <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-royal opacity-0 transition-all duration-300 group-hover:opacity-100">
                   View full biodata <ArrowRight size={13} />
                 </span>
                 {m.locked && (
-                  <Lock size={13} className="absolute right-4 top-4 text-gold/50" data-testid={`member-card-lock-${slugOf(m.name)}`} />
+                  <Lock size={13} className="absolute right-4 top-4 text-royal/50" data-testid={`member-card-lock-${slugOf(m.name)}`} />
                 )}
               </motion.button>
             ))}

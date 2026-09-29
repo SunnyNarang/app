@@ -14,7 +14,7 @@ User choices (via Q&A): email+password login (custom, I create accounts), admin 
   - Startup seed: admin + demo member users, 12 members, 5 meetings (relative dates), 4 projects (only when collections empty)
 - Frontend: React (CRA + craco) + Tailwind + framer-motion + lenis smooth scroll + sonner toasts
   - Pages: / (hero + marquee + mission + bento pillars + animated impact counters + schedule preview + leadership + join CTA), /members (search, filters, cards, biodata modal), /login (gold-beam card, demo quick logins), /admin (stats + members/meetings/projects tabs with modals)
-  - Design: obsidian #0B0C10 + gold #D4AF37, Cinzel display / Plus Jakarta Sans body / JetBrains Mono data, custom SVG rotary-wheel logo + favicon, grain overlay, scroll progress bar, masked-line hero reveal, parallax hero
+  - Design: obsidian-navy #090C15 + royal blue #4169E1, Cinzel display / Plus Jakarta Sans body / JetBrains Mono data, custom SVG rotary-wheel logo + favicon, grain overlay, scroll progress bar, masked-line hero reveal, parallax hero
 
 ## Personas
 - Guest visitor: reads club info, schedule preview, member public profiles — private biodata locked

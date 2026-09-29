@@ -14,13 +14,13 @@ module.exports = {
                 mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
             },
             colors: {
-                obsidian: '#0B0C10',
-                panel: '#131620',
-                'panel-hover': '#1A1E2C',
-                gold: {
-                    DEFAULT: '#D4AF37',
-                    light: '#F3E5AB',
-                    dark: '#996515',
+                obsidian: '#090C15',
+                panel: '#111726',
+                'panel-hover': '#19233B',
+                royal: {
+                    DEFAULT: '#4169E1',
+                    light: '#C7D9FF',
+                    dark: '#1E3A8A',
                 },
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
@@ -65,13 +65,13 @@ module.exports = {
                 'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
                 'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } },
                 marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
-                'gold-pan': { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+                'royal-pan': { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
                 marquee: 'marquee 45s linear infinite',
-                'gold-pan': 'gold-pan 6s ease infinite',
+                'royal-pan': 'royal-pan 6s ease infinite',
             }
         }
     },

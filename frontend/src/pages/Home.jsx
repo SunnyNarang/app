@@ -64,7 +64,7 @@ const Counter = ({ to, suffix, prefix, decimals }) => {
     return () => controls.stop();
   }, [inView, to]);
   return (
-    <span ref={ref} className="gold-text font-display text-4xl font-bold sm:text-5xl" data-testid="impact-counter">
+    <span ref={ref} className="royal-text font-display text-4xl font-bold sm:text-5xl" data-testid="impact-counter">
       {prefix}
       {val.toLocaleString("en-IN", { maximumFractionDigits: decimals, minimumFractionDigits: decimals })}
       {suffix}
@@ -100,17 +100,17 @@ const Hero = () => {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="mb-7 inline-flex items-center gap-3 rounded-full border border-gold/40 bg-black/50 px-4 py-2 backdrop-blur"
+          className="mb-7 inline-flex items-center gap-3 rounded-full border border-royal/40 bg-black/50 px-4 py-2 backdrop-blur"
           data-testid="hero-badge"
         >
           <Logo size={16} />
-          <span className="eyebrow !text-gold-light">Rotary International · District 3053 · Gwalior</span>
+          <span className="eyebrow !text-royal-light">Rotary International · District 3053 · Gwalior</span>
         </motion.div>
 
         <h1 className="font-display text-4xl font-bold leading-[1.08] sm:text-6xl lg:text-7xl">
           <MaskedLine delay={0.2}>Service Above Self.</MaskedLine>
           <MaskedLine delay={0.38}>
-            <span className="gold-text animate-gold-pan">Innovated for Gwalior.</span>
+            <span className="royal-text">Innovated for Gwalior.</span>
           </MaskedLine>
         </h1>
 
@@ -131,7 +131,7 @@ const Hero = () => {
           transition={{ duration: 0.7, delay: 0.75 }}
           className="mt-10 flex flex-wrap items-center gap-4"
         >
-          <a href="#impact" data-testid="hero-explore-button" className="btn-gold">
+          <a href="#impact" data-testid="hero-explore-button" className="btn-royal">
             Explore Our Impact <ArrowRight size={17} />
           </a>
           <Link to="/members" data-testid="hero-members-button" className="btn-ghost">
@@ -142,9 +142,9 @@ const Hero = () => {
 
       <motion.div
         style={{ opacity: fade }}
-        className="absolute bottom-8 right-6 z-10 hidden items-center gap-2 text-gold/70 md:flex"
+        className="absolute bottom-8 right-6 z-10 hidden items-center gap-2 text-royal/70 md:flex"
       >
-        <span className="eyebrow !text-gold/60">Scroll</span>
+        <span className="eyebrow !text-royal/60">Scroll</span>
         <motion.span animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 1.8 }}>
           <ArrowDown size={16} />
         </motion.span>
@@ -158,7 +158,7 @@ const Mission = () => (
     <div className="grid items-center gap-14 lg:grid-cols-2">
       <Reveal>
         <div className="relative">
-          <div className="absolute -inset-3 rounded-2xl border border-gold/25" />
+          <div className="absolute -inset-3 rounded-2xl border border-royal/25" />
           <img
             src={FORT_IMG}
             alt="Gwalior Fort heritage"
@@ -166,7 +166,7 @@ const Mission = () => (
             data-testid="mission-image"
           />
           <div className="glass-card absolute -bottom-8 -right-4 max-w-[240px] p-5 sm:-right-8">
-            <p className="font-display text-3xl font-bold text-gold" data-testid="mission-since">2015</p>
+            <p className="font-display text-3xl font-bold text-royal" data-testid="mission-since">2015</p>
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">
               Chartered in Gwalior, serving ever since
             </p>
@@ -177,7 +177,7 @@ const Mission = () => (
         <p className="eyebrow mb-4">Our Mission</p>
         <h2 className="font-display text-2xl font-bold leading-snug sm:text-3xl lg:text-4xl">
           Take on Gwalior&apos;s hardest problems —{" "}
-          <span className="gold-text">with a maker&apos;s mindset.</span>
+          <span className="royal-text">with a maker&apos;s mindset.</span>
         </h2>
         <p className="mt-6 leading-relaxed text-slate-300">
           We are not a chequebook club. Every Innovator rolls up their sleeves: our engineers
@@ -192,7 +192,7 @@ const Mission = () => (
             ["Innovation as tradition", "From water ATMs to code bootcamps — new tools, old values."],
           ].map(([t, d]) => (
             <li key={t} className="flex items-start gap-4">
-              <span className="mt-1.5 h-2 w-2 shrink-0 rotate-45 bg-gold" />
+              <span className="mt-1.5 h-2 w-2 shrink-0 rotate-45 bg-royal" />
               <span>
                 <span className="font-bold text-slate-100">{t}</span>
                 <span className="text-slate-400"> — {d}</span>
@@ -210,7 +210,7 @@ const Pillars = () => (
     <Reveal>
       <p className="eyebrow mb-4">Where We Serve</p>
       <h2 className="max-w-2xl font-display text-2xl font-bold sm:text-3xl lg:text-4xl">
-        Four pillars, one promise — <span className="gold-text">a better Gwalior.</span>
+        Four pillars, one promise — <span className="royal-text">a better Gwalior.</span>
       </h2>
     </Reveal>
     <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -233,10 +233,10 @@ const Pillars = () => (
               <div className="absolute inset-0 bg-gradient-to-t from-panel via-panel/40 to-transparent lg:bg-gradient-to-r" />
             </div>
             <div className={`relative p-6 sm:p-8 ${i === 0 || i === 3 ? "lg:w-3/5" : ""}`}>
-              <p.icon size={26} className="text-gold" />
+              <p.icon size={26} className="text-royal" />
               <h3 className="mt-4 font-display text-xl font-bold sm:text-2xl">{p.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-slate-400">{p.desc}</p>
-              <p className="mt-5 inline-block rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 font-mono text-xs text-gold-light">
+              <p className="mt-5 inline-block rounded-full border border-royal/30 bg-royal/10 px-4 py-1.5 font-mono text-xs text-royal-light">
                 {p.stat}
               </p>
             </div>
@@ -248,12 +248,12 @@ const Pillars = () => (
 );
 
 const Impact = () => (
-  <section id="impact" className="border-y border-gold/15 bg-black/40">
+  <section id="impact" className="border-y border-royal/15 bg-black/40">
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
       <Reveal>
         <p className="eyebrow mb-4">Impact, Counted</p>
         <h2 className="font-display text-2xl font-bold sm:text-3xl lg:text-4xl">
-          Numbers we are <span className="gold-text">proud to repeat.</span>
+          Numbers we are <span className="royal-text">proud to repeat.</span>
         </h2>
       </Reveal>
       <div className="mt-14 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
@@ -282,7 +282,7 @@ const Schedule = () => {
       <Reveal>
         <p className="eyebrow mb-4">Club Schedule</p>
         <h2 className="font-display text-2xl font-bold sm:text-3xl lg:text-4xl">
-          This month at the <span className="gold-text">weekly wheel.</span>
+          This month at the <span className="royal-text">weekly wheel.</span>
         </h2>
       </Reveal>
       <div className="mt-14 grid gap-5 lg:grid-cols-3" data-testid="schedule-preview">
@@ -295,27 +295,27 @@ const Schedule = () => {
           <Reveal key={m.id} delay={i * 0.08}>
             <article className="glass-card flex h-full flex-col p-6 sm:p-7" data-testid={`schedule-card-${i}`}>
               <div className="flex items-start justify-between gap-4">
-                <div className="rounded-lg border border-gold/30 bg-gold/10 px-4 py-3 text-center">
-                  <p className="font-display text-2xl font-bold text-gold" data-testid={`schedule-date-${i}`}>
+                <div className="rounded-lg border border-royal/30 bg-royal/10 px-4 py-3 text-center">
+                  <p className="font-display text-2xl font-bold text-royal" data-testid={`schedule-date-${i}`}>
                     {dayjs(m.date).format("DD")}
                   </p>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-gold-light">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-royal-light">
                     {dayjs(m.date).format("MMM")}
                   </p>
                 </div>
-                <span className="rounded-full border border-gold/25 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-gold/80">
+                <span className="rounded-full border border-royal/25 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-royal/80">
                   {m.kind}
                 </span>
               </div>
               <h3 className="mt-5 font-display text-lg font-bold">{m.title}</h3>
               <p className="mt-2 flex items-center gap-2 text-xs text-slate-400">
-                <Clock size={13} className="text-gold" /> {dayjs(m.date).format("dddd")} · {m.time}
+                <Clock size={13} className="text-royal" /> {dayjs(m.date).format("dddd")} · {m.time}
               </p>
               <p className="mt-1.5 flex items-start gap-2 text-xs text-slate-400">
-                <MapPin size={13} className="mt-0.5 shrink-0 text-gold" /> {m.venue}
+                <MapPin size={13} className="mt-0.5 shrink-0 text-royal" /> {m.venue}
               </p>
               {m.speaker && (
-                <p className="mt-4 flex items-center gap-2 border-t border-gold/10 pt-4 text-xs text-gold-light">
+                <p className="mt-4 flex items-center gap-2 border-t border-royal/10 pt-4 text-xs text-royal-light">
                   <Mic2 size={13} /> {m.speaker} — <span className="text-slate-400">{m.topic}</span>
                 </p>
               )}
@@ -326,7 +326,7 @@ const Schedule = () => {
       <Reveal delay={0.2}>
         <p className="mt-8 text-sm text-slate-400" data-testid="schedule-rsvp-hint">
           Members can view the full year&apos;s schedule and RSVP from the members&apos; area.{" "}
-          <Link to="/login" className="font-semibold text-gold hover:text-gold-light">
+          <Link to="/login" className="font-semibold text-royal hover:text-royal-light">
             Log in
           </Link>
         </p>
@@ -355,7 +355,7 @@ const Leadership = () => (
     <div className="grid items-center gap-14 lg:grid-cols-5">
       <Reveal className="lg:col-span-2">
         <div className="relative">
-          <div className="absolute -inset-3 rounded-2xl border border-gold/25" />
+          <div className="absolute -inset-3 rounded-2xl border border-royal/25" />
           <img
             src="https://images.unsplash.com/photo-1771244670407-42e9585ab333?crop=entropy&cs=srgb&fm=jpg&q=85"
             alt="Rtn. Er. Alok Sharma, Club President"
@@ -363,14 +363,14 @@ const Leadership = () => (
             data-testid="president-photo"
           />
           <div className="glass-card absolute -bottom-8 left-4 right-4 p-5">
-            <p className="font-display text-lg font-bold text-gold-light">Rtn. Er. Alok Sharma</p>
+            <p className="font-display text-lg font-bold text-royal-light">Rtn. Er. Alok Sharma</p>
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Club President · 2025-26</p>
           </div>
         </div>
       </Reveal>
       <div className="lg:col-span-3">
         <Reveal>
-          <Quote size={40} className="text-gold/50" />
+          <Quote size={40} className="text-royal/50" />
           <blockquote
             className="mt-4 font-display text-2xl font-semibold leading-snug sm:text-3xl"
             data-testid="president-quote"
@@ -386,10 +386,10 @@ const Leadership = () => (
                 <img
                   src={l.photo}
                   alt={l.name}
-                  className="h-20 w-20 rounded-full object-cover ring-2 ring-gold/40"
+                  className="h-20 w-20 rounded-full object-cover ring-2 ring-royal/40"
                 />
                 <p className="mt-4 text-sm font-bold">{l.name}</p>
-                <p className="mt-1 text-xs leading-relaxed text-gold/80">{l.role}</p>
+                <p className="mt-1 text-xs leading-relaxed text-royal/80">{l.role}</p>
               </div>
             </Reveal>
           ))}
@@ -400,19 +400,19 @@ const Leadership = () => (
 );
 
 const JoinBand = () => (
-  <section className="relative overflow-hidden border-t border-gold/20 bg-black/40">
+  <section className="relative overflow-hidden border-t border-royal/20 bg-black/40">
     <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-20 text-center sm:px-6 sm:py-28">
       <Reveal>
         <p className="eyebrow mb-4">Join The Wheel</p>
         <h2 className="max-w-3xl font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-          Your time. Your talent. <span className="gold-text">Your Gwalior.</span>
+          Your time. Your talent. <span className="royal-text">Your Gwalior.</span>
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-slate-400">
           Membership is by invitation of the board — but the first step is a Thursday dinner.
           Meet the people behind the projects.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-4">
-          <Link to="/members" data-testid="join-members-button" className="btn-gold">
+          <Link to="/members" data-testid="join-members-button" className="btn-royal">
             Meet Our Members <ArrowRight size={17} />
           </Link>
           <Link to="/login" data-testid="join-login-button" className="btn-ghost">

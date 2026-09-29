@@ -45,11 +45,11 @@ export default function MemberModal({ member, onClose }) {
         exit={{ y: 40, opacity: 0, scale: 0.98 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
-        className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-t-2xl border border-gold/25 bg-panel shadow-[0_20px_80px_rgba(0,0,0,0.7)] sm:rounded-2xl"
+        className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-t-2xl border border-royal/25 bg-panel shadow-[0_20px_80px_rgba(0,0,0,0.7)] sm:rounded-2xl"
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full border border-gold/30 bg-black/60 p-2 text-gold transition-all hover:bg-gold hover:text-black"
+          className="absolute right-4 top-4 z-10 rounded-full border border-royal/30 bg-black/60 p-2 text-royal-light transition-all hover:bg-royal hover:text-white"
           data-testid="biodata-close-button"
           aria-label="Close biodata"
         >
@@ -57,7 +57,7 @@ export default function MemberModal({ member, onClose }) {
         </button>
 
         <div className="grid gap-0 md:grid-cols-5">
-          <div className="relative border-b border-gold/15 bg-black/30 p-8 text-center md:col-span-2 md:border-b-0 md:border-r">
+          <div className="relative border-b border-royal/15 bg-black/30 p-8 text-center md:col-span-2 md:border-b-0 md:border-r">
             <div className="flex justify-center">
               <Avatar member={member} size="h-32 w-32" />
             </div>
@@ -65,7 +65,7 @@ export default function MemberModal({ member, onClose }) {
               {member.name}
             </h2>
             {member.role && (
-              <p className="mt-2 inline-block rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold-light" data-testid="biodata-role">
+              <p className="mt-2 inline-block rounded-full border border-royal/30 bg-royal/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-royal-light" data-testid="biodata-role">
                 {member.role}
               </p>
             )}
@@ -75,14 +75,14 @@ export default function MemberModal({ member, onClose }) {
                 ["Business / Firm", member.business],
                 ["Member since", member.joined_year],
               ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-4 border-b border-gold/10 pb-3">
+                <div key={k} className="flex justify-between gap-4 border-b border-royal/10 pb-3">
                   <dt className="text-slate-500">{k}</dt>
                   <dd className="text-right font-medium text-slate-200">{v || "—"}</dd>
                 </div>
               ))}
             </dl>
             {member.paul_harris && (
-              <p className="mt-6 rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs text-gold-light" data-testid="biodata-phf-badge">
+              <p className="mt-6 rounded-lg border border-royal/30 bg-royal/10 p-3 text-xs text-royal-light" data-testid="biodata-phf-badge">
                 Paul Harris Fellow — recognised for exceptional giving to The Rotary Foundation.
               </p>
             )}
@@ -98,7 +98,7 @@ export default function MemberModal({ member, onClose }) {
               <p className="eyebrow mb-4">Members-Only Biodata</p>
 
               {locked ? (
-                <div className="relative overflow-hidden rounded-xl border border-gold/25" data-testid="biodata-locked-panel">
+                <div className="relative overflow-hidden rounded-xl border border-royal/25" data-testid="biodata-locked-panel">
                   <div className="pointer-events-none select-none space-y-3 p-5 opacity-60 blur-[6px]" aria-hidden="true">
                     {rows.map((r) => (
                       <div key={r.testId} className="flex items-center justify-between gap-4 rounded-lg bg-black/30 px-4 py-3">
@@ -108,10 +108,10 @@ export default function MemberModal({ member, onClose }) {
                     ))}
                   </div>
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/55 p-6 text-center backdrop-blur-[2px]">
-                    <span className="rounded-full border border-gold/40 bg-gold/15 p-3 text-gold">
+                    <span className="rounded-full border border-royal/40 bg-royal/15 p-3 text-royal">
                       <Lock size={20} />
                     </span>
-                    <p className="text-sm font-semibold text-gold-light" data-testid="biodata-locked-message">
+                    <p className="text-sm font-semibold text-royal-light" data-testid="biodata-locked-message">
                       Members-only information
                     </p>
                     <p className="max-w-xs text-xs leading-relaxed text-slate-400">
@@ -120,7 +120,7 @@ export default function MemberModal({ member, onClose }) {
                     </p>
                     <Link
                       to="/login"
-                      className="btn-gold !px-5 !py-2.5 !text-xs"
+                      className="btn-royal !px-5 !py-2.5 !text-xs"
                       data-testid="biodata-login-cta"
                     >
                       <Lock size={13} /> Member Login to Unlock
@@ -135,11 +135,11 @@ export default function MemberModal({ member, onClose }) {
                       initial={{ opacity: 0, x: -14 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.45, delay: 0.08 + i * 0.07 }}
-                      className="flex items-center justify-between gap-4 rounded-lg border border-gold/15 bg-black/30 px-4 py-3 transition-colors hover:border-gold/40"
+                      className="flex items-center justify-between gap-4 rounded-lg border border-royal/15 bg-black/30 px-4 py-3 transition-colors hover:border-royal/40"
                       data-testid={`biodata-${r.testId}-unlocked`}
                     >
                       <span className="flex items-center gap-2.5 text-xs text-slate-400">
-                        <r.icon size={15} className="text-gold" /> {r.label}
+                        <r.icon size={15} className="text-royal" /> {r.label}
                       </span>
                       <span className="text-right text-sm font-semibold text-slate-100">
                         {r.value || "—"}

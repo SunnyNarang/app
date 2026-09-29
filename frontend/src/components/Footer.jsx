@@ -4,7 +4,7 @@ import { Logo, LogoLockup } from "./Logo";
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-gold/20 bg-black/60">
+    <footer className="relative overflow-hidden border-t border-royal/20 bg-black/60">
       <Logo
         size={420}
         className="pointer-events-none absolute -bottom-32 -right-24 opacity-[0.04]"
@@ -18,7 +18,7 @@ export default function Footer() {
             compass and service as our creed.
           </p>
           <div className="mt-6 flex items-start gap-3 text-sm text-slate-300" data-testid="footer-meeting-info">
-            <Clock size={16} className="mt-0.5 shrink-0 text-gold" />
+            <Clock size={16} className="mt-0.5 shrink-0 text-royal" />
             <span>
               Weekly Fellowship — Every Thursday, 7:00 PM
               <br />
@@ -29,28 +29,28 @@ export default function Footer() {
         <div>
           <p className="eyebrow mb-5">Explore</p>
           <ul className="space-y-3 text-sm">
-            <li><Link to="/" className="text-slate-300 transition-colors hover:text-gold" data-testid="footer-home-link">Home</Link></li>
-            <li><Link to="/members" className="text-slate-300 transition-colors hover:text-gold" data-testid="footer-members-link">Members&apos; Directory</Link></li>
-            <li><Link to="/login" className="text-slate-300 transition-colors hover:text-gold" data-testid="footer-login-link">Member Login</Link></li>
-            <li><Link to="/admin" className="text-slate-300 transition-colors hover:text-gold" data-testid="footer-admin-link">Admin Portal</Link></li>
+            <li><Link to="/" className="text-slate-300 transition-colors hover:text-royal" data-testid="footer-home-link">Home</Link></li>
+            <li><Link to="/members" className="text-slate-300 transition-colors hover:text-royal" data-testid="footer-members-link">Members&apos; Directory</Link></li>
+            <li><Link to="/login" className="text-slate-300 transition-colors hover:text-royal" data-testid="footer-login-link">Member Login</Link></li>
+            <li><Link to="/admin" className="text-slate-300 transition-colors hover:text-royal" data-testid="footer-admin-link">Admin Portal</Link></li>
           </ul>
         </div>
         <div>
           <p className="eyebrow mb-5">Reach Us</p>
           <ul className="space-y-4 text-sm text-slate-300">
             <li className="flex items-start gap-3">
-              <MapPin size={16} className="mt-0.5 shrink-0 text-gold" />
+              <MapPin size={16} className="mt-0.5 shrink-0 text-royal" />
               Gwalior, Madhya Pradesh, India
             </li>
             <li className="flex items-start gap-3">
-              <Mail size={16} className="mt-0.5 shrink-0 text-gold" />
+              <Mail size={16} className="mt-0.5 shrink-0 text-royal" />
               club@rotarygwalior.org
             </li>
           </ul>
-          <p className="mt-6 font-mono text-xs text-gold/70">Rotary International · District 3053</p>
+          <p className="mt-6 font-mono text-xs text-royal/70">Rotary International · District 3053</p>
         </div>
       </div>
-      <div className="border-t border-gold/10 py-6 text-center text-xs text-slate-500">
+      <div className="border-t border-royal/10 py-6 text-center text-xs text-slate-500">
         © 2025-26 Rotary Club of Gwalior Innovators · Service Above Self
       </div>
     </footer>
