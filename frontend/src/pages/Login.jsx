@@ -62,12 +62,13 @@ export default function Login() {
               data-testid="login-form"
             >
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email address"
+                placeholder="Email or username"
                 className="input-dark"
+                autoComplete="username"
                 data-testid="login-email-input"
               />
               <input
@@ -111,7 +112,7 @@ export default function Login() {
                   <UserRound size={14} /> Member Demo
                 </button>
                 <button
-                  onClick={() => doLogin("admin@rotarygwalior.org", "admin123")}
+                  onClick={() => doLogin("admin", "admin")}
                   disabled={busy}
                   className="btn-ghost !px-3 !py-2.5 !text-xs"
                   data-testid="demo-admin-login-button"

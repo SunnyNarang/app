@@ -23,9 +23,12 @@ User choices (via Q&A): email+password login (custom, I create accounts), admin 
 
 ## Implemented (2026-09-29)
 - Auth (login/logout/me/refresh), roles, lockout, admin+member seeding
+- Login accepts username (admin) OR email (members); admin credentials: admin/admin (changeable in-app)
+- Credential management: member email = login username (mandatory), 8-char password auto-generated on create, visible & editable in Admin → Members → Edit; member self-service "Change Password" (navbar + admin panel) syncs back to the admin edit panel
 - Privacy-gated member directory + biodata modal (locked/unlocked states with animations)
 - Home page (hero, marquee, mission, 4 pillars bento, animated counters, schedule, leadership, join band)
-- Admin panel (stats, members table + add/edit/delete incl. private fields, meetings CRUD, projects CRUD, toasts)
+- Admin panel (stats, members table + add/edit/delete incl. private fields + credentials, meetings CRUD, projects CRUD, toasts)
+- Royal-blue re-theme (obsidian-navy + #4169E1), static non-flicker buttons, members grid renders instantly on load
 - Mobile-responsive layouts, testids on all interactive elements
 
 ## Sample data note

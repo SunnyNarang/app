@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard,
+  Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api, formatApiErrorDetail } from "../lib/api";
 import { Reveal } from "../components/Reveal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 import { Avatar } from "./Members";
 
 const TABS = [
@@ -53,7 +54,15 @@ const Modal = ({ title, onClose, children }) => (
 const EMPTY_MEMBER = {
   name: "", role: "", classification: "", business: "", bio: "", photo_url: "",
   joined_year: new Date().getFullYear(), paul_harris: false, past_president: false,
-  board_member: false, phone: "", email: "", address: "", birthday: "", anniversary: "", spouse: "",
+  board_member: false, phone: "", email: "", login_password: "", address: "",
+  birthday: "", anniversary: "", spouse: "",
+};
+
+const genPw = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let out = "";
+  for (let i = 0; i < 8; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
 };
 
 const DeleteButton = ({ onConfirm, testId }) => {
@@ -74,6 +83,7 @@ const DeleteButton = ({ onConfirm, testId }) => {
 
 export default function Admin() {
   const [tab, setTab] = useState("members");
+  const [pwOpen, setPwOpen] = useState(false);
   const [stats, setStats] = useState(null);
   const [members, setMembers] = useState([]);
   const [meetings, setMeetings] = useState([]);
@@ -116,13 +126,15 @@ export default function Admin() {
       joined_year: parseInt(f.joined_year, 10) || new Date().getFullYear(),
     };
     setSaving(true);
-    mutate(
-      () => (f.id ? api.put(`/members/${f.id}`, payload) : api.post("/members", payload)),
-      f.id ? "Member updated" : "Member added"
-    ).finally(() => {
-      setSaving(false);
-      setMemberForm(null);
-    });
+    const req = f.id ? api.put(`/members/${f.id}`, payload) : api.post("/members", payload);
+    req.then(({ data }) => {
+      toast.success(f.id ? "Member updated" : `Member added — login password: ${data.login_password}`);
+      return loadAll();
+    }).catch((e) => toast.error(formatApiErrorDetail(e.response?.data?.detail) || "Action failed"))
+      .finally(() => {
+        setSaving(false);
+        setMemberForm(null);
+      });
   };
 
   const saveMeeting = (e) => {
@@ -163,6 +175,15 @@ export default function Admin() {
           <h1 className="flex items-center gap-3 font-display text-3xl font-bold sm:text-4xl">
             <LayoutDashboard className="text-royal" /> Club Command Center
           </h1>
+          <div className="mt-5">
+            <button
+              onClick={() => setPwOpen(true)}
+              className="btn-ghost !px-4 !py-2 !text-xs"
+              data-testid="admin-change-password-button"
+            >
+              <KeyRound size={14} /> Change Admin Password
+            </button>
+          </div>
         </Reveal>
 
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -224,6 +245,7 @@ export default function Admin() {
                           <div>
                             <p className="font-semibold text-slate-100">{m.name}</p>
                             <p className="text-xs text-royal/70">{m.role}</p>
+                            <p className="text-[11px] text-slate-500">{m.email || "no email set"}</p>
                           </div>
                         </div>
                       </td>
@@ -238,7 +260,17 @@ export default function Admin() {
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => setMemberForm({ ...m })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light transition-all hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-member-${m.id}`}>
+                          <button
+                            onClick={() => {
+                              setMemberForm({ ...m, login_password: "" });
+                              api
+                                .get(`/members/${m.id}/credentials`)
+                                .then(({ data }) => setMemberForm((f) => (f && f.id === m.id ? { ...f, login_password: data.login_password || "" } : f)))
+                                .catch(() => {});
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light transition-all hover:border-royal hover:bg-royal/10"
+                            data-testid={`admin-edit-member-${m.id}`}
+                          >
                             <Pencil size={13} /> Edit
                           </button>
                           <DeleteButton
@@ -323,6 +355,8 @@ export default function Admin() {
         )}
       </div>
 
+      {pwOpen && <ChangePasswordModal onClose={() => setPwOpen(false)} />}
+
       <AnimatePresence>
         {memberForm && (
           <Modal title={memberForm.id ? "Edit Member" : "Add New Member"} onClose={() => setMemberForm(null)}>
@@ -358,10 +392,23 @@ export default function Admin() {
                   </label>
                 ))}
               </div>
+              <p className="eyebrow pt-2">Member Login Credentials</p>
+              <div className="grid gap-4 rounded-lg border border-royal/15 bg-black/30 p-4 sm:grid-cols-2">
+                <Field label="Email — login username (required)">
+                  <input required type="email" className="input-dark" value={memberForm.email} onChange={(e) => setMemberForm({ ...memberForm, email: e.target.value })} placeholder="member@example.com" data-testid="member-form-email" />
+                </Field>
+                <Field label="Login Password (8 characters)">
+                  <div className="flex gap-2">
+                    <input className="input-dark font-mono" value={memberForm.login_password} onChange={(e) => setMemberForm({ ...memberForm, login_password: e.target.value })} placeholder="Blank = auto-generate" data-testid="member-form-password" />
+                    <button type="button" onClick={() => setMemberForm({ ...memberForm, login_password: genPw() })} className="btn-ghost !px-3 !py-2 !text-xs shrink-0" data-testid="member-form-generate-password">
+                      Generate
+                    </button>
+                  </div>
+                </Field>
+              </div>
               <p className="eyebrow pt-2">Members-only details</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Phone"><input className="input-dark" value={memberForm.phone} onChange={(e) => setMemberForm({ ...memberForm, phone: e.target.value })} data-testid="member-form-phone" /></Field>
-                <Field label="Email"><input className="input-dark" value={memberForm.email} onChange={(e) => setMemberForm({ ...memberForm, email: e.target.value })} data-testid="member-form-email" /></Field>
                 <Field label="Residential Address"><input className="input-dark" value={memberForm.address} onChange={(e) => setMemberForm({ ...memberForm, address: e.target.value })} data-testid="member-form-address" /></Field>
                 <Field label="Birthday (e.g. 12 March)"><input className="input-dark" value={memberForm.birthday} onChange={(e) => setMemberForm({ ...memberForm, birthday: e.target.value })} data-testid="member-form-birthday" /></Field>
                 <Field label="Anniversary"><input className="input-dark" value={memberForm.anniversary} onChange={(e) => setMemberForm({ ...memberForm, anniversary: e.target.value })} data-testid="member-form-anniversary" /></Field>

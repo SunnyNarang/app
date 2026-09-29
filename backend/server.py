@@ -1,6 +1,8 @@
 import os
 import jwt
 import bcrypt
+import secrets
+import string
 import logging
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -37,6 +39,27 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain: str, hashed: str) -> bool:
     return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+
+
+def gen_password(length: int = 8) -> str:
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+async def sync_member_user(name: str, email: str, password: str):
+    """Keep the login account of a member in sync with the member record."""
+    if not email or not password:
+        return
+    hashed = hash_password(password)
+    existing = await db.users.find_one({"email": email})
+    if existing:
+        if existing.get("role") == "admin":
+            return
+        await db.users.update_one({"_id": existing["_id"]},
+                                  {"$set": {"password_hash": hashed, "name": name, "role": "member"}})
+    else:
+        await db.users.insert_one({"email": email, "username": "", "password_hash": hashed,
+                                   "name": name, "role": "member", "created_at": iso_now()})
 
 
 def create_access_token(user_id: str, email: str) -> str:
@@ -96,6 +119,7 @@ class Member(BaseDocument):
     board_member: bool = False
     phone: str = ""
     email: str = ""
+    login_password: str = ""
     address: str = ""
     birthday: str = ""
     anniversary: str = ""
@@ -127,8 +151,13 @@ class Project(BaseDocument):
 
 
 class LoginIn(BaseModel):
-    email: str
+    identifier: str
     password: str
+
+
+class ChangePasswordIn(BaseModel):
+    current_password: str
+    new_password: str
 
 
 # ---- Auth dependencies ----
@@ -221,27 +250,42 @@ async def root():
 
 @api_router.post("/auth/login")
 async def login(body: LoginIn, request: Request, response: Response):
-    email = body.email.strip().lower()
+    ident = body.identifier.strip().lower()
+    password = body.password
     forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
     client_ip = forwarded or (request.client.host if request.client else "unknown")
-    identifier = f"{client_ip}:{email}"
+    lock_key = f"{client_ip}:{ident}"
 
-    rec = await db.login_attempts.find_one({"identifier": identifier})
+    rec = await db.login_attempts.find_one({"identifier": lock_key})
     if rec and rec.get("count", 0) >= 5 and datetime.now(timezone.utc) < rec.get("locked_until", datetime.now(timezone.utc)):
         raise HTTPException(status_code=429, detail="Too many failed attempts. Try again in a few minutes.")
 
-    user = await db.users.find_one({"email": email})
-    if not user or not verify_password(body.password, user.get("password_hash", "")):
+    user = None
+    if "@" in ident:
+        user = await db.users.find_one({"email": ident})
+        if not (user and verify_password(password, user.get("password_hash", ""))):
+            user = None
+        if not user:
+            member = await db.members.find_one({"email": ident})
+            if member and member.get("login_password") and password == member["login_password"]:
+                await sync_member_user(member.get("name", ""), ident, password)
+                user = await db.users.find_one({"email": ident})
+    else:
+        user = await db.users.find_one({"username": ident})
+        if not (user and verify_password(password, user.get("password_hash", ""))):
+            user = None
+
+    if not user:
         await db.login_attempts.update_one(
-            {"identifier": identifier},
+            {"identifier": lock_key},
             {"$inc": {"count": 1},
              "$set": {"locked_until": datetime.now(timezone.utc) + timedelta(minutes=15)}},
             upsert=True)
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=401, detail="Invalid username or password")
 
-    await db.login_attempts.delete_many({"identifier": identifier})
+    await db.login_attempts.delete_many({"identifier": lock_key})
     uid = str(user["_id"])
-    set_auth_cookies(response, create_access_token(uid, email), create_refresh_token(uid))
+    set_auth_cookies(response, create_access_token(uid, user["email"]), create_refresh_token(uid))
     return user_public(user)
 
 
@@ -278,6 +322,25 @@ async def refresh(request: Request, response: Response):
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
 
+@api_router.post("/auth/change-password")
+async def change_password(body: ChangePasswordIn, user: dict = Depends(get_current_user)):
+    if len(body.new_password) < 4:
+        raise HTTPException(status_code=422, detail="New password must be at least 4 characters")
+    if not verify_password(body.current_password, user.get("password_hash", "")):
+        ok = False
+        if user.get("role") != "admin":
+            member = await db.members.find_one({"email": user.get("email", "")})
+            if member and member.get("login_password") == body.current_password:
+                ok = True
+        if not ok:
+            raise HTTPException(status_code=400, detail="Current password is incorrect")
+    await db.users.update_one({"_id": user["_id"]},
+                              {"$set": {"password_hash": hash_password(body.new_password)}})
+    await db.members.update_one({"email": user.get("email", "")},
+                                {"$set": {"login_password": body.new_password}})
+    return {"ok": True}
+
+
 # ---- Members (biodata with privacy gate) ----
 
 @api_router.get("/members")
@@ -295,30 +358,58 @@ async def get_member(member_id: str, user: Optional[dict] = Depends(get_optional
     return member_out(doc, user is not None)
 
 
+def require_valid_member_email(email: str):
+    if not email or "@" not in email or len(email) < 5:
+        raise HTTPException(status_code=422,
+                            detail="A valid email id is required — it acts as the member's login username")
+
+
 @api_router.post("/members", dependencies=[Depends(require_admin)])
 async def create_member(member: Member):
+    require_valid_member_email(member.email)
+    if not member.login_password:
+        member.login_password = gen_password()
     doc = member.to_mongo()
     res = await db.members.insert_one(doc)
     doc["_id"] = res.inserted_id
-    return member_out(doc, True)
+    await sync_member_user(member.name, member.email, member.login_password)
+    return {**member_out(doc, True), "login_password": member.login_password}
 
 
 @api_router.put("/members/{member_id}", dependencies=[Depends(require_admin)])
 async def update_member(member_id: str, member: Member):
+    require_valid_member_email(member.email)
+    if not member.login_password:
+        member.login_password = gen_password()
+    old = await db.members.find_one({"_id": to_oid(member_id)})
+    if not old:
+        raise HTTPException(status_code=404, detail="Member not found")
+    if old.get("email") and old["email"] != member.email:
+        await db.users.delete_many({"email": old["email"], "role": {"$ne": "admin"}})
     update = member.to_mongo()
     update.pop("created_at", None)
     res = await db.members.find_one_and_update({"_id": to_oid(member_id)},
                                                {"$set": update}, return_document=True)
-    if not res:
-        raise HTTPException(status_code=404, detail="Member not found")
+    await sync_member_user(member.name, member.email, member.login_password)
     return member_out(res, True)
+
+
+@api_router.get("/members/{member_id}/credentials", dependencies=[Depends(require_admin)])
+async def member_credentials(member_id: str):
+    doc = await db.members.find_one({"_id": to_oid(member_id)}, {"email": 1, "login_password": 1})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return {"email": doc.get("email", ""), "login_password": doc.get("login_password", "")}
 
 
 @api_router.delete("/members/{member_id}", dependencies=[Depends(require_admin)])
 async def delete_member(member_id: str):
-    res = await db.members.delete_one({"_id": to_oid(member_id)})
-    if not res.deleted_count:
+    doc = await db.members.find_one({"_id": to_oid(member_id)})
+    if not doc:
         raise HTTPException(status_code=404, detail="Member not found")
+    if doc.get("email"):
+        await db.users.delete_many({"email": doc["email"], "role": {"$ne": "admin"}})
+    await db.members.delete_one({"_id": to_oid(member_id)})
     return {"ok": True}
 
 
@@ -600,15 +691,13 @@ def seed_meetings():
 @app.on_event("startup")
 async def seed():
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@rotarygwalior.org")
-    admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
-    existing = await db.users.find_one({"email": admin_email})
+    admin_password = os.environ.get("ADMIN_PASSWORD", "admin")
+    existing = await db.users.find_one({"$or": [{"email": admin_email}, {"username": "admin"}]})
     if existing is None:
-        await db.users.insert_one({"email": admin_email, "password_hash": hash_password(admin_password),
+        await db.users.insert_one({"email": admin_email, "username": "admin",
+                                   "password_hash": hash_password(admin_password),
                                    "name": "Admin", "role": "admin", "created_at": iso_now()})
         logger.info("Seeded admin user %s", admin_email)
-    elif not verify_password(admin_password, existing["password_hash"]):
-        await db.users.update_one({"email": admin_email},
-                                  {"$set": {"password_hash": hash_password(admin_password)}})
 
     member_email = "member@rotarygwalior.org"
     if not await db.users.find_one({"email": member_email}):
@@ -627,6 +716,29 @@ async def seed():
     if await db.projects.count_documents({}) == 0:
         await db.projects.insert_many(SEED_PROJECTS)
         logger.info("Seeded projects")
+
+    # one-time migration: admin signs in with username 'admin' / password 'admin'
+    admin = await db.users.find_one({"$or": [{"email": admin_email}, {"username": "admin"}]})
+    if admin:
+        updates = {}
+        if not admin.get("username"):
+            updates["username"] = "admin"
+        if verify_password("admin123", admin.get("password_hash", "")):
+            updates["password_hash"] = hash_password("admin")
+        if updates:
+            await db.users.update_one({"_id": admin["_id"]}, {"$set": updates})
+            logger.info("Migrated admin login to username 'admin'")
+
+    # keep the demo member password stable for the demo login button
+    await db.members.update_one({"email": "alok.sharma@rotarygwalior.org"},
+                                {"$set": {"login_password": "member123"}})
+
+    # every member with an email gets a login account whose password the admin can view
+    async for m in db.members.find({"email": {"$exists": True, "$ne": ""}}):
+        pwd = m.get("login_password") or gen_password()
+        if not m.get("login_password"):
+            await db.members.update_one({"_id": m["_id"]}, {"$set": {"login_password": pwd}})
+        await sync_member_user(m.get("name", ""), m["email"], pwd)
 
     await db.users.create_index("email", unique=True)
     await db.login_attempts.create_index("identifier")

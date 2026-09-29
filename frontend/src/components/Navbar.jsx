@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { Menu, X, LogOut, ShieldCheck } from "lucide-react";
+import { Menu, X, LogOut, ShieldCheck, KeyRound } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { LogoLockup } from "./Logo";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 export const initialsOf = (name = "") =>
   name
@@ -23,6 +24,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
 
@@ -69,6 +71,13 @@ export default function Navbar() {
                   </div>
                 </div>
                 <button
+                  onClick={() => setPwOpen(true)}
+                  data-testid="nav-change-password-button"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-royal/30 px-4 py-2 text-xs font-semibold text-royal-light transition-all duration-300 hover:border-royal/70 hover:bg-royal/10"
+                >
+                  <KeyRound size={14} /> Password
+                </button>
+                <button
                   onClick={logout}
                   data-testid="nav-logout-button"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-royal/30 px-4 py-2 text-xs font-semibold text-royal-light transition-all duration-300 hover:border-royal/70 hover:bg-royal/10"
@@ -97,6 +106,8 @@ export default function Navbar() {
           className="h-[2px] origin-left bg-gradient-to-r from-royal-dark via-royal to-royal-light"
         />
       </div>
+
+      {pwOpen && <ChangePasswordModal onClose={() => setPwOpen(false)} />}
 
       <AnimatePresence>
         {open && (
@@ -130,16 +141,28 @@ export default function Navbar() {
               )}
               <div className="mt-4 border-t border-royal/15 pt-4">
                 {user ? (
-                  <button
-                    onClick={() => {
-                      logout();
-                      setOpen(false);
-                    }}
-                    data-testid="nav-mobile-logout-button"
-                    className="btn-ghost w-full"
-                  >
-                    <LogOut size={15} /> Logout ({user.name})
-                  </button>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => {
+                        setOpen(false);
+                        setPwOpen(true);
+                      }}
+                      data-testid="nav-mobile-password-button"
+                      className="btn-ghost w-full"
+                    >
+                      <KeyRound size={15} /> Change Password
+                    </button>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setOpen(false);
+                      }}
+                      data-testid="nav-mobile-logout-button"
+                      className="btn-ghost w-full"
+                    >
+                      <LogOut size={15} /> Logout ({user.name})
+                    </button>
+                  </div>
                 ) : (
                   <Link to="/login" onClick={() => setOpen(false)} data-testid="nav-mobile-login-button" className="btn-royal w-full">
                     Member Login
