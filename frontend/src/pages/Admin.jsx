@@ -322,7 +322,7 @@ export default function Admin() {
         {tab === "projects" && (
           <section className="mt-8">
             <div className="mb-6 flex justify-end">
-              <button onClick={() => setProjectForm({ title: "", description: "", category: "", image_url: "", status: "active", volunteers: 0, hours: 0, lives_impacted: 0, date: dayjs().format("YYYY-MM-DD") })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-project-button">
+              <button onClick={() => setProjectForm({ title: "", description: "", caption: "", category: "", image_url: "", status: "active", volunteers: 0, hours: 0, lives_impacted: 0, date: dayjs().format("YYYY-MM-DD") })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-project-button">
                 <Plus size={15} /> Add Project
               </button>
             </div>
@@ -470,6 +470,11 @@ export default function Admin() {
                     onChange={(url) => setProjectForm({ ...projectForm, image_url: url })}
                     testIdPrefix="project-photo-upload"
                   />
+                </div>
+                <div className="sm:col-span-2">
+                  <Field label="Gallery Caption (one-line story)">
+                    <input className="input-dark" value={projectForm.caption} onChange={(e) => setProjectForm({ ...projectForm, caption: e.target.value })} placeholder="e.g. 60 volunteers, 12 tonnes of waste, one proud morning" data-testid="project-form-caption" />
+                  </Field>
                 </div>
                 <Field label="Volunteers"><input type="number" className="input-dark" value={projectForm.volunteers} onChange={(e) => setProjectForm({ ...projectForm, volunteers: e.target.value })} data-testid="project-form-volunteers" /></Field>
                 <Field label="Service Hours"><input type="number" className="input-dark" value={projectForm.hours} onChange={(e) => setProjectForm({ ...projectForm, hours: e.target.value })} data-testid="project-form-hours" /></Field>

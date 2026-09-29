@@ -29,6 +29,7 @@ User choices (via Q&A): email+password login (custom, I create accounts), admin 
 - Member self-service profile editing: Members page → "Edit My Profile" (photo, name, firm, classification, phone, address, birthday, anniversary, spouse, bio); email, role and member-since are admin-only (GET/PUT /api/profile whitelist)
 - Photo upload system: POST /api/upload (any logged-in user) → EXIF-orient, centre-square-crop, resize 500×500 JPEG q85 (Pillow) → Emergent object storage (rotary-gwalior/photos/...) → public serving via GET /api/media/{path}; file refs in db.files with soft-delete on replacement; PhotoUpload component with square preview wired into member profile editor + admin member form + admin project form; Avatar resolves relative /api/media URLs across environments
 - Home gallery: "Moments from our service" editorial mosaic (up to 6 project photos, feature tile 2×2, hover zoom, captions) fed from project image_urls; hides gracefully when no images
+- Gallery captions: admin adds a one-line story per project ("Gallery Caption" field); shown with royal-blue rule on the wide gallery tiles only (small tiles keep title+category)
 - Home page (hero, marquee, mission, 4 pillars bento, animated counters, schedule, leadership, join band)
 - Admin panel (stats, members table + add/edit/delete incl. private fields + credentials, meetings CRUD, projects CRUD, toasts)
 - Royal-blue re-theme (obsidian-navy + #4169E1), static non-flicker buttons, members grid renders instantly on load

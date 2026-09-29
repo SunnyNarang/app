@@ -437,6 +437,14 @@ const Gallery = () => {
               <figcaption className="absolute bottom-0 left-0 right-0 p-4">
                 <p className="text-sm font-bold text-slate-100">{p.title}</p>
                 <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-royal-light">{p.category}</p>
+                {p.caption && (i === 0 || i === 3 || i === 5) && (
+                  <p
+                    className="mt-2 line-clamp-2 border-l-2 border-royal/60 pl-3 text-[11px] leading-relaxed text-slate-300 sm:text-xs"
+                    data-testid={`gallery-caption-${i}`}
+                  >
+                    {p.caption}
+                  </p>
+                )}
               </figcaption>
             </figure>
           </Reveal>

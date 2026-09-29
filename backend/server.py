@@ -219,6 +219,7 @@ class Meeting(BaseDocument):
 class Project(BaseDocument):
     title: str
     description: str = ""
+    caption: str = ""
     category: str = ""
     image_url: str = ""
     status: str = "active"
