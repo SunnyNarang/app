@@ -3,17 +3,17 @@ import { motion } from "framer-motion";
 import { X, Loader2, Lock, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { api, formatApiErrorDetail } from "../lib/api";
+import PhotoUpload from "./PhotoUpload";
 
 const FIELDS = [
-  ["name", "Full Name *", true],
-  ["classification", "Classification", false],
-  ["business", "Business / Firm", false],
-  ["photo_url", "Photo URL", false],
-  ["phone", "Phone Number", false],
-  ["birthday", "Birthday (e.g. 12 March)", false],
-  ["anniversary", "Wedding Anniversary", false],
-  ["spouse", "Spouse Name", false],
-  ["address", "Residential Address", false],
+  ["name", "Full Name *"],
+  ["classification", "Classification"],
+  ["business", "Business / Firm"],
+  ["phone", "Phone Number"],
+  ["birthday", "Birthday (e.g. 12 March)"],
+  ["anniversary", "Wedding Anniversary"],
+  ["spouse", "Spouse Name"],
+  ["address", "Residential Address"],
 ];
 
 export default function MyProfileModal({ onClose, onSaved }) {
@@ -105,28 +105,25 @@ export default function MyProfileModal({ onClose, onSaved }) {
         )}
 
         <form onSubmit={submit} className="space-y-4" data-testid="my-profile-form">
+          <div className="rounded-lg border border-royal/15 bg-black/30 p-4" data-testid="my-profile-photo-section">
+            <PhotoUpload
+              value={form.photo_url}
+              onChange={(url) => setForm({ ...form, photo_url: url })}
+              testIdPrefix="my-profile-photo"
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {FIELDS.map(([key, label, full]) => (
-              <label key={key} className={full === "name" || key === "address" ? "block sm:col-span-2" : "block"}>
+            {FIELDS.map(([key, label]) => (
+              <label key={key} className={key === "name" || key === "address" ? "block sm:col-span-2" : "block"}>
                 <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
                   {label}
                 </span>
-                {key === "bio" ? (
-                  <textarea
-                    rows={3}
-                    className="input-dark"
-                    value={form.bio}
-                    onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                    data-testid="my-profile-bio"
-                  />
-                ) : (
-                  <input
-                    className="input-dark"
-                    value={form[key]}
-                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                    data-testid={`my-profile-${key.replace("_", "-")}`}
-                  />
-                )}
+                <input
+                  className="input-dark"
+                  value={form[key]}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  data-testid={`my-profile-${key.replace("_", "-")}`}
+                />
               </label>
             ))}
             <label className="block sm:col-span-2">

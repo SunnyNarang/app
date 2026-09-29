@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Lock, ArrowRight, PenLine } from "lucide-react";
-import { api } from "../lib/api";
+import { api, API_BASE } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import MemberModal from "../components/MemberModal";
 import MyProfileModal from "../components/MyProfileModal";
+import { photoSrcOf } from "../components/PhotoUpload";
 import { Reveal } from "../components/Reveal";
 import { initialsOf } from "../components/Navbar";
 
@@ -30,7 +31,7 @@ export const Avatar = ({ member, size = "h-24 w-24" }) => (
   >
     {member.photo_url ? (
       <img
-        src={member.photo_url}
+        src={photoSrcOf(member.photo_url)}
         alt={member.name}
         className="h-full w-full object-cover"
         loading="lazy"

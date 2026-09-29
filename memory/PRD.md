@@ -27,6 +27,7 @@ User choices (via Q&A): email+password login (custom, I create accounts), admin 
 - Credential management: member email = login username (mandatory), 8-char password auto-generated on create, visible & editable in Admin → Members → Edit; member self-service "Change Password" (navbar + admin panel) syncs back to the admin edit panel
 - Privacy-gated member directory + biodata modal (locked/unlocked states with animations)
 - Member self-service profile editing: Members page → "Edit My Profile" (photo, name, firm, classification, phone, address, birthday, anniversary, spouse, bio); email, role and member-since are admin-only (GET/PUT /api/profile whitelist)
+- Photo upload system: POST /api/upload (any logged-in user) → EXIF-orient, centre-square-crop, resize 500×500 JPEG q85 (Pillow) → Emergent object storage (rotary-gwalior/photos/...) → public serving via GET /api/media/{path}; file refs in db.files with soft-delete on replacement; PhotoUpload component with square preview wired into member profile editor + admin member form; Avatar resolves relative /api/media URLs across environments
 - Home page (hero, marquee, mission, 4 pillars bento, animated counters, schedule, leadership, join band)
 - Admin panel (stats, members table + add/edit/delete incl. private fields + credentials, meetings CRUD, projects CRUD, toasts)
 - Royal-blue re-theme (obsidian-navy + #4169E1), static non-flicker buttons, members grid renders instantly on load

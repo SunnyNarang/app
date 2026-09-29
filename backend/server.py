@@ -1,5 +1,7 @@
+import io
 import os
 import jwt
+import uuid
 import bcrypt
 import secrets
 import string
@@ -8,12 +10,17 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Annotated
 
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request, Response
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request, Response, File, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, ConfigDict, BeforeValidator
+import requests
+
 from bson import ObjectId
+
+from PIL import Image, ImageOps
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -60,6 +67,77 @@ async def sync_member_user(name: str, email: str, password: str):
     else:
         await db.users.insert_one({"email": email, "username": "", "password_hash": hashed,
                                    "name": name, "role": "member", "created_at": iso_now()})
+
+
+# ---- Object storage (member photos) ----
+
+STORAGE_BASE = (os.environ.get("INTEGRATION_PROXY_URL") or "").strip() or "https://integrations.emergentagent.com"
+STORAGE_URL = STORAGE_BASE.rstrip("/") + "/objstore/api/v1/storage"
+EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
+APP_NAME = "rotary-gwalior"
+storage_key = None
+
+
+def init_storage(force: bool = False) -> str:
+    """Mint a session-scoped storage key once; force=True recovers a dead key."""
+    global storage_key
+    if storage_key and not force:
+        return storage_key
+    resp = requests.post(f"{STORAGE_URL}/init", json={"emergent_key": EMERGENT_KEY}, timeout=30)
+    resp.raise_for_status()
+    storage_key = resp.json()["storage_key"]
+    return storage_key
+
+
+def put_object(path: str, data: bytes, content_type: str) -> dict:
+    key = init_storage()
+    resp = requests.put(f"{STORAGE_URL}/objects/{path}",
+                        headers={"X-Storage-Key": key, "Content-Type": content_type},
+                        data=data, timeout=120)
+    if resp.status_code in (400, 404):
+        key = init_storage(force=True)
+        resp = requests.put(f"{STORAGE_URL}/objects/{path}",
+                            headers={"X-Storage-Key": key, "Content-Type": content_type},
+                            data=data, timeout=120)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def get_object(path: str) -> bytes:
+    key = init_storage()
+    resp = requests.get(f"{STORAGE_URL}/objects/{path}", headers={"X-Storage-Key": key}, timeout=60)
+    if resp.status_code in (400, 404):
+        key = init_storage(force=True)
+        resp = requests.get(f"{STORAGE_URL}/objects/{path}", headers={"X-Storage-Key": key}, timeout=60)
+    resp.raise_for_status()
+    return resp.content
+
+
+def process_photo(data: bytes) -> bytes:
+    """EXIF-orient, centre-crop to a square and resize to 500x500 JPEG."""
+    img = Image.open(io.BytesIO(data))
+    img = ImageOps.exif_transpose(img)
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+    w, h = img.size
+    side = min(w, h)
+    left = (w - side) // 2
+    top = (h - side) // 2
+    img = img.crop((left, top, left + side, top + side))
+    img = img.resize((500, 500), Image.LANCZOS)
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=85, optimize=True)
+    return buf.getvalue()
+
+
+ALLOWED_PHOTO_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
+
+async def maybe_release_photo(old_url: str, new_url: str):
+    """Soft-delete the previous uploaded photo when it is replaced."""
+    if old_url and old_url.startswith("/api/media/") and old_url != new_url:
+        old_path = old_url.split("/api/media/", 1)[1]
+        await db.files.update_one({"storage_path": old_path}, {"$set": {"is_deleted": True}})
 
 
 def create_access_token(user_id: str, email: str) -> str:
@@ -376,11 +454,54 @@ async def update_my_profile(body: MemberSelfIn, user: dict = Depends(get_current
     if not body.name.strip():
         raise HTTPException(status_code=422, detail="Name is required")
     updates = {f: getattr(body, f).strip() for f in MEMBER_SELF_FIELDS}
+    await maybe_release_photo(member.get("photo_url"), updates["photo_url"])
     await db.members.update_one({"_id": member["_id"]}, {"$set": updates})
     if updates["name"] != user.get("name"):
         await db.users.update_one({"_id": user["_id"]}, {"$set": {"name": updates["name"]}})
     doc = await db.members.find_one({"_id": member["_id"]})
     return member_out(doc, True)
+
+
+# ---- Photo upload & serving ----
+
+@api_router.post("/upload")
+async def upload_photo(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    if (file.content_type or "") not in ALLOWED_PHOTO_TYPES:
+        raise HTTPException(status_code=422, detail="Only JPG, PNG or WebP images are allowed")
+    data = await file.read()
+    if len(data) > 8 * 1024 * 1024:
+        raise HTTPException(status_code=422, detail="Image must be under 8 MB")
+    try:
+        processed = await run_in_threadpool(process_photo, data)
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=422, detail="That file could not be read as an image")
+    path = f"{APP_NAME}/photos/{str(user['_id'])}/{uuid.uuid4()}.jpg"
+    try:
+        result = await run_in_threadpool(put_object, path, processed, "image/jpeg")
+    except Exception as e:
+        logger.error("Storage upload failed: %s", e)
+        raise HTTPException(status_code=502, detail="Photo storage is temporarily unavailable, try again shortly")
+    await db.files.insert_one({
+        "storage_path": result["path"], "uploaded_by": str(user["_id"]),
+        "original_filename": file.filename, "content_type": "image/jpeg",
+        "size": len(processed), "is_deleted": False, "created_at": iso_now(),
+    })
+    return {"path": result["path"], "url": f"/api/media/{result['path']}", "size": len(processed)}
+
+
+@api_router.get("/media/{path:path}")
+async def serve_media(path: str):
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        data = await run_in_threadpool(get_object, path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="File not found")
+    return Response(content=data, media_type="image/jpeg",
+                    headers={"Cache-Control": "public, max-age=86400"})
 
 
 # ---- Members (biodata with privacy gate) ----
@@ -428,6 +549,7 @@ async def update_member(member_id: str, member: Member):
         raise HTTPException(status_code=404, detail="Member not found")
     if old.get("email") and old["email"] != member.email:
         await db.users.delete_many({"email": old["email"], "role": {"$ne": "admin"}})
+    await maybe_release_photo(old.get("photo_url"), member.photo_url)
     update = member.to_mongo()
     update.pop("created_at", None)
     res = await db.members.find_one_and_update({"_id": to_oid(member_id)},
@@ -732,6 +854,15 @@ def seed_meetings():
 
 @app.on_event("startup")
 async def seed():
+    try:
+        if EMERGENT_KEY:
+            init_storage()
+            logger.info("Object storage initialised")
+        else:
+            logger.error("EMERGENT_LLM_KEY missing — photo uploads disabled")
+    except Exception as e:
+        logger.error("Storage init failed: %s", e)
+
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@rotarygwalior.org")
     admin_password = os.environ.get("ADMIN_PASSWORD", "admin")
     existing = await db.users.find_one({"$or": [{"email": admin_email}, {"username": "admin"}]})

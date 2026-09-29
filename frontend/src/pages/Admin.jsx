@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { api, formatApiErrorDetail } from "../lib/api";
 import { Reveal } from "../components/Reveal";
 import ChangePasswordModal from "../components/ChangePasswordModal";
+import PhotoUpload from "../components/PhotoUpload";
 import { Avatar } from "./Members";
 
 const TABS = [
@@ -374,9 +375,13 @@ export default function Admin() {
                 <Field label="Business / Firm">
                   <input className="input-dark" value={memberForm.business} onChange={(e) => setMemberForm({ ...memberForm, business: e.target.value })} data-testid="member-form-business" />
                 </Field>
-                <Field label="Photo URL">
-                  <input className="input-dark" value={memberForm.photo_url} onChange={(e) => setMemberForm({ ...memberForm, photo_url: e.target.value })} data-testid="member-form-photo" />
-                </Field>
+                <div className="sm:col-span-2 rounded-lg border border-royal/15 bg-black/30 p-4" data-testid="admin-photo-upload-section">
+                  <PhotoUpload
+                    value={memberForm.photo_url}
+                    onChange={(url) => setMemberForm({ ...memberForm, photo_url: url })}
+                    testIdPrefix="admin-photo-upload"
+                  />
+                </div>
                 <Field label="Joined Year">
                   <input type="number" className="input-dark" value={memberForm.joined_year} onChange={(e) => setMemberForm({ ...memberForm, joined_year: e.target.value })} data-testid="member-form-joined" />
                 </Field>
