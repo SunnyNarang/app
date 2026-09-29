@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound, Image as ImageIcon,
+  Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound,
+  Image as ImageIcon, ChevronUp, ChevronDown,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api, formatApiErrorDetail } from "../lib/api";
@@ -171,6 +172,15 @@ export default function Admin() {
       setSaving(false);
       setProjectForm(null);
     });
+  };
+
+  const moveGallery = async (id, direction) => {
+    try {
+      await api.post(`/gallery/${id}/move`, { direction });
+      await loadAll();
+    } catch (e) {
+      toast.error(formatApiErrorDetail(e.response?.data?.detail) || "Could not move photo");
+    }
   };
 
   const saveGallery = (e) => {
@@ -378,7 +388,10 @@ export default function Admin() {
 
         {tab === "gallery" && (
           <section className="mt-8">
-            <div className="mb-6 flex justify-end">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-slate-400" data-testid="admin-gallery-hint">
+                <span className="font-semibold text-royal-light">Tip:</span> the first photo becomes the big feature tile on the home page — use the arrows to reorder.
+              </p>
               <button onClick={() => setGalleryForm({ caption: "", image_url: "" })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-gallery-button">
                 <Plus size={15} /> Add Gallery Photo
               </button>
@@ -389,18 +402,41 @@ export default function Admin() {
               </p>
             )}
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {galleryItems.map((g) => (
+              {galleryItems.map((g, idx) => (
                 <div key={g.id} className="glass-card overflow-hidden" data-testid={`admin-gallery-row-${g.id}`}>
                   <img src={photoSrcOf(g.image_url)} alt={g.caption || "Gallery photo"} className="h-40 w-full object-cover" />
                   <div className="p-4">
                     <p className="line-clamp-2 min-h-[2.5rem] text-xs leading-relaxed text-slate-300">
                       {g.caption || <span className="text-slate-500">No caption</span>}
                     </p>
-                    <div className="mt-3 flex gap-2">
-                      <button onClick={() => setGalleryForm({ ...g })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-gallery-${g.id}`}>
-                        <Pencil size={13} /> Edit
+                    <div className="mt-3 flex items-center gap-1.5">
+                      <button
+                        onClick={() => moveGallery(g.id, "up")}
+                        disabled={idx === 0}
+                        className="rounded-lg border border-royal/25 p-1.5 text-royal-light transition-all hover:border-royal hover:bg-royal/10 disabled:opacity-30 disabled:hover:border-royal/25 disabled:hover:bg-transparent"
+                        data-testid={`admin-gallery-up-${g.id}`}
+                        aria-label="Move up (towards feature tile)"
+                      >
+                        <ChevronUp size={14} />
                       </button>
-                      <DeleteButton testId={`admin-delete-gallery-${g.id}`} onConfirm={() => mutate(() => api.delete(`/gallery/${g.id}`), "Gallery photo removed")} />
+                      <button
+                        onClick={() => moveGallery(g.id, "down")}
+                        disabled={idx === galleryItems.length - 1}
+                        className="rounded-lg border border-royal/25 p-1.5 text-royal-light transition-all hover:border-royal hover:bg-royal/10 disabled:opacity-30 disabled:hover:border-royal/25 disabled:hover:bg-transparent"
+                        data-testid={`admin-gallery-down-${g.id}`}
+                        aria-label="Move down"
+                      >
+                        <ChevronDown size={14} />
+                      </button>
+                      <span className={`ml-1 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest ${idx === 0 ? "bg-royal text-white" : "border border-royal/25 text-slate-400"}`} data-testid={`admin-gallery-position-${idx}`}>
+                        {idx === 0 ? "Feature" : `#${idx + 1}`}
+                      </span>
+                      <div className="ml-auto flex gap-2">
+                        <button onClick={() => setGalleryForm({ ...g })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-gallery-${g.id}`}>
+                          <Pencil size={13} /> Edit
+                        </button>
+                        <DeleteButton testId={`admin-delete-gallery-${g.id}`} onConfirm={() => mutate(() => api.delete(`/gallery/${g.id}`), "Gallery photo removed")} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -546,6 +582,7 @@ export default function Admin() {
                   value={galleryForm.image_url}
                   onChange={(url) => setGalleryForm({ ...galleryForm, image_url: url })}
                   testIdPrefix="gallery-photo-upload"
+                  mode="full"
                 />
               </div>
               <Field label="Caption (one-line story)">

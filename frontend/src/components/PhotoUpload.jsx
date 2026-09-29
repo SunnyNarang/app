@@ -12,7 +12,7 @@ export const photoSrcOf = (url) => {
   return `${API_BASE}${url}`;
 };
 
-export default function PhotoUpload({ value, onChange, testIdPrefix = "photo-upload" }) {
+export default function PhotoUpload({ value, onChange, testIdPrefix = "photo-upload", mode = "square" }) {
   const inputRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const preview = photoSrcOf(value);
@@ -33,9 +33,10 @@ export default function PhotoUpload({ value, onChange, testIdPrefix = "photo-upl
     try {
       const fd = new FormData();
       fd.append("file", f);
+      fd.append("mode", mode);
       const { data } = await api.post("/upload", fd);
       onChange(data.url);
-      toast.success("Photo uploaded — processed to a 500×500 square");
+      toast.success(mode === "full" ? "Photo uploaded — original size and aspect ratio kept" : "Photo uploaded — processed to a 500×500 square");
     } catch (err) {
       toast.error(formatApiErrorDetail(err.response?.data?.detail) || "Upload failed, please try again");
     } finally {

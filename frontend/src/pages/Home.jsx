@@ -11,7 +11,8 @@ import { photoSrcOf } from "../components/PhotoUpload";
 import Lightbox from "../components/Lightbox";
 import { Reveal, MaskedLine } from "../components/Reveal";
 import { Marquee } from "../components/Marquee";
-import { Logo, initialsOf } from "../components/Logo";
+import { Logo } from "../components/Logo";
+import { initialsOf } from "../components/Navbar";
 
 const HERO_BG =
   "https://images.unsplash.com/photo-1643269877099-ea5393b80320?crop=entropy&cs=srgb&fm=jpg&q=85";
@@ -352,54 +353,76 @@ const LEADERS = [
   },
 ];
 
-const Leadership = () => (
-  <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 sm:pb-32">
-    <div className="grid items-center gap-14 lg:grid-cols-5">
-      <Reveal className="lg:col-span-2">
-        <div className="relative">
-          <div className="absolute -inset-3 rounded-2xl border border-royal/25" />
-          <img
-            src="https://images.unsplash.com/photo-1771244670407-42e9585ab333?crop=entropy&cs=srgb&fm=jpg&q=85"
-            alt="Rtn. Er. Alok Sharma, Club President"
-            className="relative aspect-[4/5] w-full rounded-xl object-cover"
-            data-testid="president-photo"
-          />
-          <div className="glass-card absolute -bottom-8 left-4 right-4 p-5">
-            <p className="font-display text-lg font-bold text-royal-light">Rtn. Er. Alok Sharma</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Club President · 2025-26</p>
-          </div>
-        </div>
+const Leadership = () => {
+  const [leaders, setLeaders] = useState([]);
+  useEffect(() => {
+    api
+      .get("/members")
+      .then(({ data }) => {
+        const slots = [
+          { key: "president", label: "Club President", match: (r) => r.includes("president") && !r.includes("past") },
+          { key: "secretary", label: "Club Secretary", match: (r) => r.includes("secretary") && !r.includes("past") },
+          { key: "treasurer", label: "Treasurer", match: (r) => r.includes("treasurer") && !r.includes("past") },
+        ];
+        const picked = slots
+          .map((slot) => {
+            const active = data.find((m) => slot.match((m.role || "").toLowerCase()));
+            if (active) return { ...slot, member: active };
+            const past = data.find((m) => (m.role || "").toLowerCase().includes(slot.key));
+            return past ? { ...slot, label: `Past ${slot.label}`, member: past } : null;
+          })
+          .filter(Boolean);
+        setLeaders(picked);
+      })
+      .catch(() => setLeaders([]));
+  }, []);
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 sm:pb-32">
+      <Reveal>
+        <p className="eyebrow mb-4">Club Leadership</p>
+        <h2 className="font-display text-2xl font-bold sm:text-3xl lg:text-4xl">
+          The team that <span className="royal-text">turns the wheel.</span>
+        </h2>
       </Reveal>
-      <div className="lg:col-span-3">
-        <Reveal>
-          <Quote size={40} className="text-royal/50" />
-          <blockquote
-            className="mt-4 font-display text-2xl font-semibold leading-snug sm:text-3xl"
-            data-testid="president-quote"
-          >
-            &ldquo;Rotary gave us a wheel. Gwalior gave us a reason to turn it — every camp,
-            every classroom, every Thursday.&rdquo;
-          </blockquote>
-        </Reveal>
-        <div className="mt-12 grid gap-5 sm:grid-cols-3">
-          {LEADERS.map((l, i) => (
-            <Reveal key={l.name} delay={i * 0.08}>
-              <div className="glass-card group p-5" data-testid={`leader-card-${i}`}>
-                <img
-                  src={l.photo}
-                  alt={l.name}
-                  className="h-20 w-20 rounded-full object-cover ring-2 ring-royal/40"
-                />
-                <p className="mt-4 text-sm font-bold">{l.name}</p>
-                <p className="mt-1 text-xs leading-relaxed text-royal/80">{l.role}</p>
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-testid="leadership-grid">
+        {leaders.map((l, i) => (
+          <Reveal key={l.key} delay={i * 0.08}>
+            <Link
+              to="/members"
+              className="glass-card group block h-full overflow-hidden"
+              data-testid={`leader-tile-${l.key}`}
+            >
+              <div className="relative aspect-[4/5] w-full overflow-hidden">
+                {l.member.photo_url ? (
+                  <img
+                    src={photoSrcOf(l.member.photo_url)}
+                    alt={l.member.name}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-panel-hover to-panel">
+                    <span className="royal-text font-display text-6xl font-bold">
+                      {initialsOf(l.member.name)}
+                    </span>
+                  </div>
+                )}
               </div>
-            </Reveal>
-          ))}
-        </div>
+              <div className="p-6">
+                <span className="inline-block rounded-full border border-royal/30 bg-royal/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-royal-light">
+                  {l.label}
+                </span>
+                <p className="mt-3 font-display text-lg font-bold">{l.member.name}</p>
+                <p className="mt-1 text-xs text-slate-400">{l.member.role}</p>
+                <p className="mt-2 font-mono text-xs text-royal/70">{l.member.classification}</p>
+              </div>
+            </Link>
+          </Reveal>
+        ))}
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const Gallery = () => {
   const [items, setItems] = useState([]);

@@ -10,7 +10,7 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Annotated
 
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request, Response, File, UploadFile
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request, Response, File, UploadFile, Form
 from fastapi.concurrency import run_in_threadpool
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -127,6 +127,22 @@ def process_photo(data: bytes) -> bytes:
     img = img.resize((500, 500), Image.LANCZOS)
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=85, optimize=True)
+    return buf.getvalue()
+
+
+def process_photo_full(data: bytes) -> bytes:
+    """Keep actual size and aspect ratio — EXIF-orient and re-encode as JPEG only."""
+    img = Image.open(io.BytesIO(data))
+    img = ImageOps.exif_transpose(img)
+    if img.mode in ("RGBA", "LA", "P"):
+        img = img.convert("RGBA")
+        bg = Image.new("RGB", img.size, (255, 255, 255))
+        bg.paste(img, mask=img.split()[-1])
+        img = bg
+    elif img.mode != "RGB":
+        img = img.convert("RGB")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=88, optimize=True)
     return buf.getvalue()
 
 
@@ -466,19 +482,20 @@ async def update_my_profile(body: MemberSelfIn, user: dict = Depends(get_current
 # ---- Photo upload & serving ----
 
 @api_router.post("/upload")
-async def upload_photo(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+async def upload_photo(file: UploadFile = File(...), mode: str = Form("square"), user: dict = Depends(get_current_user)):
     if (file.content_type or "") not in ALLOWED_PHOTO_TYPES:
         raise HTTPException(status_code=422, detail="Only JPG, PNG or WebP images are allowed")
     data = await file.read()
     if len(data) > 8 * 1024 * 1024:
         raise HTTPException(status_code=422, detail="Image must be under 8 MB")
+    full = mode == "full"
     try:
-        processed = await run_in_threadpool(process_photo, data)
+        processed = await run_in_threadpool(process_photo_full if full else process_photo, data)
     except HTTPException:
         raise
     except Exception:
         raise HTTPException(status_code=422, detail="That file could not be read as an image")
-    path = f"{APP_NAME}/photos/{str(user['_id'])}/{uuid.uuid4()}.jpg"
+    path = f"{APP_NAME}/{'gallery' if full else 'photos'}/{str(user['_id'])}/{uuid.uuid4()}.jpg"
     try:
         result = await run_in_threadpool(put_object, path, processed, "image/jpeg")
     except Exception as e:
@@ -649,12 +666,17 @@ async def delete_project(project_id: str):
 class GalleryItem(BaseDocument):
     caption: str = ""
     image_url: str = ""
+    order: int = 0
     created_at: str = Field(default_factory=iso_now)
+
+
+class MoveIn(BaseModel):
+    direction: str  # "up" | "down"
 
 
 @api_router.get("/gallery")
 async def list_gallery():
-    docs = await db.gallery.find().sort("created_at", -1).to_list(200)
+    docs = await db.gallery.find().sort("order", 1).to_list(200)
     return [doc_out(d) for d in docs]
 
 
@@ -662,10 +684,25 @@ async def list_gallery():
 async def create_gallery_item(item: GalleryItem):
     if not item.image_url:
         raise HTTPException(status_code=422, detail="Please upload a photo for the gallery item")
+    first = await db.gallery.find_one({}, sort=[("order", 1)])
+    item.order = (first["order"] - 1) if first and "order" in first else 0
     doc = item.to_mongo()
     res = await db.gallery.insert_one(doc)
     doc["_id"] = res.inserted_id
     return doc_out(doc)
+
+
+@api_router.post("/gallery/{item_id}/move", dependencies=[Depends(require_admin)])
+async def move_gallery_item(item_id: str, body: MoveIn):
+    items = await db.gallery.find().sort("order", 1).to_list(200)
+    idx = next((i for i, d in enumerate(items) if str(d["_id"]) == item_id), -1)
+    if idx == -1:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    new_idx = idx - 1 if body.direction == "up" else idx + 1
+    if 0 <= new_idx < len(items):
+        await db.gallery.update_one({"_id": items[idx]["_id"]}, {"$set": {"order": new_idx}})
+        await db.gallery.update_one({"_id": items[new_idx]["_id"]}, {"$set": {"order": idx}})
+    return {"ok": True}
 
 
 @api_router.put("/gallery/{item_id}", dependencies=[Depends(require_admin)])
