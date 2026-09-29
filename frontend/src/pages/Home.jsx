@@ -217,30 +217,26 @@ const Pillars = () => (
         Four pillars, one promise — <span className="royal-text">a better Gwalior.</span>
       </h2>
     </Reveal>
-    <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {PILLARS.map((p, i) => (
-        <Reveal
-          key={p.title}
-          delay={i * 0.08}
-          className={i === 0 ? "lg:col-span-2" : i === 3 ? "lg:col-span-2" : ""}
-        >
+        <Reveal key={p.title} delay={i * 0.06}>
           <article
-            className={`glass-card group relative h-full min-h-[280px] overflow-hidden ${i === 0 || i === 3 ? "lg:flex" : ""}`}
+            className="glass-card group flex h-full flex-col overflow-hidden"
             data-testid={`pillar-card-${i}`}
           >
-            <div className={`relative min-h-[160px] ${i === 0 || i === 3 ? "lg:w-2/5" : ""}`}>
+            <div className="relative h-36 shrink-0 overflow-hidden sm:h-40">
               <img
                 src={p.img}
                 alt={p.title}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-panel via-panel/40 to-transparent lg:bg-gradient-to-r" />
+              <div className="absolute inset-0 bg-gradient-to-t from-panel via-transparent to-transparent" />
             </div>
-            <div className={`relative p-6 sm:p-8 ${i === 0 || i === 3 ? "lg:w-3/5" : ""}`}>
-              <p.icon size={26} className="text-royal" />
-              <h3 className="mt-4 font-display text-xl font-bold sm:text-2xl">{p.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-400">{p.desc}</p>
-              <p className="mt-5 inline-block rounded-full border border-royal/30 bg-royal/10 px-4 py-1.5 font-mono text-xs text-royal-light">
+            <div className="flex flex-1 flex-col p-5">
+              <p.icon size={20} className="text-royal" />
+              <h3 className="mt-3 font-display text-base font-bold sm:text-lg">{p.title}</h3>
+              <p className="mt-2 flex-1 text-xs leading-relaxed text-slate-400">{p.desc}</p>
+              <p className="mt-4 w-fit rounded-full border border-royal/30 bg-royal/10 px-3 py-1 font-mono text-[10px] text-royal-light">
                 {p.stat}
               </p>
             </div>

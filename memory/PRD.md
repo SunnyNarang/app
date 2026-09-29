@@ -34,7 +34,7 @@ User choices (via Q&A): email+password login (custom, I create accounts), admin 
 - Membership applications: home page "Join The Wheel" section → "Apply for Membership" opens a public form (name, phone, city, profession, why rotary) → POST /api/apply; Admin → Applications tab lists all with details, mark-reviewed and delete
 - Photo lightbox: click any gallery photo → full-screen viewer with caption, counter, prev/next arrows + keyboard (Esc/←/→), backdrop close
 - Project admin form: photo upload only (no caption field)
-- Home page (hero, marquee, mission, 4 pillars bento, animated counters, schedule, leadership, join band)
+- Home page (hero, marquee, mission, 4 uniform service tiles, animated counters, schedule, leadership, join band)
 - Admin panel (stats, members table + add/edit/delete incl. private fields + credentials, meetings CRUD, projects CRUD, toasts)
 - Royal-blue re-theme (obsidian-navy + #4169E1), static non-flicker buttons, members grid renders instantly on load
 - Mobile-responsive layouts, testids on all interactive elements
