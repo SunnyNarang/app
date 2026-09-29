@@ -30,7 +30,8 @@ User choices (via Q&A): email+password login (custom, I create accounts), admin 
 - Photo upload system: POST /api/upload (any logged-in user) → EXIF-orient, centre-square-crop, resize 500×500 JPEG q85 (Pillow) → Emergent object storage (rotary-gwalior/photos/...) → public serving via GET /api/media/{path}; file refs in db.files with soft-delete on replacement; PhotoUpload component with square preview wired into member profile editor + admin member form + admin project form; Avatar resolves relative /api/media URLs across environments
 - Home gallery: "Moments from our service" is a STANDALONE gallery (db collection `gallery`, /api/gallery CRUD + /move reorder, admin-only) — upload photo + caption per item in Admin → Gallery tab; admin reorders with up/down arrows, first item = big feature tile; section hides when empty; NOT fed from projects
 - Gallery uploads use mode=full: actual pixel size and aspect ratio preserved (EXIF-orient + JPEG re-encode only); lightbox shows the full uncropped photo
-- Club leadership section: 3 equal tiles (Club President / Club Secretary / Treasurer) driven by member roles, honest "Past …" fallback labeling
+- Club leadership section: 3 equal compact tiles with round photos (Club President / Club Secretary / Treasurer) driven by member roles, honest "Past …" fallback labeling
+- Membership applications: home page "Join The Wheel" section → "Apply for Membership" opens a public form (name, phone, city, profession, why rotary) → POST /api/apply; Admin → Applications tab lists all with details, mark-reviewed and delete
 - Photo lightbox: click any gallery photo → full-screen viewer with caption, counter, prev/next arrows + keyboard (Esc/←/→), backdrop close
 - Project admin form: photo upload only (no caption field)
 - Home page (hero, marquee, mission, 4 pillars bento, animated counters, schedule, leadership, join band)

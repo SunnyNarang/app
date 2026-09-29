@@ -727,6 +727,50 @@ async def delete_gallery_item(item_id: str):
     return {"ok": True}
 
 
+# ---- Membership applications ----
+
+class ApplicationIn(BaseModel):
+    name: str
+    phone: str
+    city: str = ""
+    profession: str = ""
+    why_rotary: str = ""
+
+
+@api_router.post("/apply")
+async def apply_for_membership(body: ApplicationIn):
+    if not body.name.strip() or not body.phone.strip():
+        raise HTTPException(status_code=422, detail="Name and phone number are required")
+    doc = {"name": body.name.strip(), "phone": body.phone.strip(), "city": body.city.strip(),
+           "profession": body.profession.strip(), "why_rotary": body.why_rotary.strip(),
+           "status": "new", "created_at": iso_now()}
+    res = await db.applications.insert_one(doc)
+    return {"ok": True, "id": str(res.inserted_id)}
+
+
+@api_router.get("/applications", dependencies=[Depends(require_admin)])
+async def list_applications():
+    docs = await db.applications.find().sort("created_at", -1).to_list(500)
+    return [doc_out(d) for d in docs]
+
+
+@api_router.post("/applications/{app_id}/review", dependencies=[Depends(require_admin)])
+async def review_application(app_id: str):
+    res = await db.applications.find_one_and_update({"_id": to_oid(app_id)},
+                                                    {"$set": {"status": "reviewed"}}, return_document=True)
+    if not res:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return doc_out(res)
+
+
+@api_router.delete("/applications/{app_id}", dependencies=[Depends(require_admin)])
+async def delete_application(app_id: str):
+    res = await db.applications.delete_one({"_id": to_oid(app_id)})
+    if not res.deleted_count:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return {"ok": True}
+
+
 # ---- Admin stats ----
 
 @api_router.get("/admin/stats", dependencies=[Depends(require_admin)])

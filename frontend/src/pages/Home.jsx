@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { api } from "../lib/api";
 import { photoSrcOf } from "../components/PhotoUpload";
 import Lightbox from "../components/Lightbox";
+import ApplyModal from "../components/ApplyModal";
 import { Reveal, MaskedLine } from "../components/Reveal";
 import { Marquee } from "../components/Marquee";
 import { Logo } from "../components/Logo";
@@ -385,37 +386,35 @@ const Leadership = () => {
           The team that <span className="royal-text">turns the wheel.</span>
         </h2>
       </Reveal>
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-testid="leadership-grid">
+      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-testid="leadership-grid">
         {leaders.map((l, i) => (
           <Reveal key={l.key} delay={i * 0.08}>
             <Link
               to="/members"
-              className="glass-card group block h-full overflow-hidden"
+              className="glass-card group flex h-full flex-col items-center p-7 text-center transition-all duration-300 hover:-translate-y-1"
               data-testid={`leader-tile-${l.key}`}
             >
-              <div className="relative aspect-[4/5] w-full overflow-hidden">
+              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full ring-2 ring-royal/40 ring-offset-2 ring-offset-obsidian transition-transform duration-500 group-hover:scale-105">
                 {l.member.photo_url ? (
                   <img
                     src={photoSrcOf(l.member.photo_url)}
                     alt={l.member.name}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-panel-hover to-panel">
-                    <span className="royal-text font-display text-6xl font-bold">
+                    <span className="royal-text font-display text-2xl font-bold">
                       {initialsOf(l.member.name)}
                     </span>
                   </div>
                 )}
               </div>
-              <div className="p-6">
-                <span className="inline-block rounded-full border border-royal/30 bg-royal/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-royal-light">
-                  {l.label}
-                </span>
-                <p className="mt-3 font-display text-lg font-bold">{l.member.name}</p>
-                <p className="mt-1 text-xs text-slate-400">{l.member.role}</p>
-                <p className="mt-2 font-mono text-xs text-royal/70">{l.member.classification}</p>
-              </div>
+              <span className="mt-5 inline-block rounded-full border border-royal/30 bg-royal/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-royal-light">
+                {l.label}
+              </span>
+              <p className="mt-3 font-display text-base font-bold">{l.member.name}</p>
+              <p className="mt-1 text-xs text-slate-400">{l.member.role}</p>
+              <p className="mt-2 font-mono text-xs text-royal/70">{l.member.classification}</p>
             </Link>
           </Reveal>
         ))}
@@ -495,30 +494,36 @@ const Gallery = () => {
   );
 };
 
-const JoinBand = () => (
-  <section className="relative overflow-hidden border-t border-royal/20 bg-black/40">
-    <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-20 text-center sm:px-6 sm:py-28">
-      <Reveal>
-        <p className="eyebrow mb-4">Join The Wheel</p>
-        <h2 className="max-w-3xl font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-          Your time. Your talent. <span className="royal-text">Your Gwalior.</span>
-        </h2>
-        <p className="mx-auto mt-5 max-w-xl text-slate-400">
-          Membership is by invitation of the board — but the first step is a Thursday dinner.
-          Meet the people behind the projects.
-        </p>
-        <div className="mt-9 flex flex-wrap justify-center gap-4">
-          <Link to="/members" data-testid="join-members-button" className="btn-royal">
-            Meet Our Members <ArrowRight size={17} />
-          </Link>
-          <Link to="/login" data-testid="join-login-button" className="btn-ghost">
-            Member Login
-          </Link>
-        </div>
-      </Reveal>
-    </div>
-  </section>
-);
+const JoinBand = () => {
+  const [applyOpen, setApplyOpen] = useState(false);
+  return (
+    <section className="relative overflow-hidden border-t border-royal/20 bg-black/40">
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-20 text-center sm:px-6 sm:py-28">
+        <Reveal>
+          <p className="eyebrow mb-4">Join The Wheel</p>
+          <h2 className="max-w-3xl font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+            Your time. Your talent. <span className="royal-text">Your Gwalior.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-slate-400">
+            Membership is by invitation of the board — but every journey starts with a
+            conversation. Tell us who you are and why you want to serve.
+          </p>
+          <div className="mt-9 flex flex-wrap justify-center gap-4">
+            <button onClick={() => setApplyOpen(true)} className="btn-royal" data-testid="apply-membership-button">
+              Apply for Membership <ArrowRight size={17} />
+            </button>
+            <Link to="/login" data-testid="join-login-button" className="btn-ghost">
+              Member Login
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+      <AnimatePresence>
+        {applyOpen && <ApplyModal onClose={() => setApplyOpen(false)} />}
+      </AnimatePresence>
+    </section>
+  );
+};
 
 export default function Home() {
   return (

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
   Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound,
-  Image as ImageIcon, ChevronUp, ChevronDown,
+  Image as ImageIcon, ChevronUp, ChevronDown, UserPlus, Phone, MapPin, Briefcase,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api, formatApiErrorDetail } from "../lib/api";
@@ -17,6 +17,7 @@ const TABS = [
   { id: "meetings", label: "Meetings & Schedule", icon: CalendarDays },
   { id: "projects", label: "Service Projects", icon: HeartHandshake },
   { id: "gallery", label: "Gallery", icon: ImageIcon },
+  { id: "applications", label: "Applications", icon: UserPlus },
 ];
 
 const Field = ({ label, children }) => (
@@ -96,21 +97,24 @@ export default function Admin() {
   const [projectForm, setProjectForm] = useState(null);
   const [galleryItems, setGalleryItems] = useState([]);
   const [galleryForm, setGalleryForm] = useState(null);
+  const [applications, setApplications] = useState([]);
   const [saving, setSaving] = useState(false);
 
   const loadAll = async () => {
-    const [s, m, mt, p, g] = await Promise.all([
+    const [s, m, mt, p, g, ap] = await Promise.all([
       api.get("/admin/stats"),
       api.get("/members"),
       api.get("/meetings"),
       api.get("/projects"),
       api.get("/gallery"),
+      api.get("/applications"),
     ]);
     setStats(s.data);
     setMembers(m.data);
     setMeetings(mt.data);
     setProjects(p.data);
     setGalleryItems(g.data);
+    setApplications(ap.data);
   };
 
   useEffect(() => {
@@ -438,6 +442,65 @@ export default function Admin() {
                         <DeleteButton testId={`admin-delete-gallery-${g.id}`} onConfirm={() => mutate(() => api.delete(`/gallery/${g.id}`), "Gallery photo removed")} />
                       </div>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {tab === "applications" && (
+          <section className="mt-8">
+            <p className="mb-6 text-sm text-slate-400" data-testid="applications-count">
+              {applications.length} application{applications.length === 1 ? "" : "s"} ·{" "}
+              <span className="font-semibold text-emerald-400">
+                {applications.filter((a) => a.status === "new").length} new
+              </span>
+            </p>
+            {applications.length === 0 && (
+              <p className="text-sm text-slate-400" data-testid="applications-empty-hint">
+                No applications yet — they arrive when visitors use &ldquo;Apply for Membership&rdquo; on the home page.
+              </p>
+            )}
+            <div className="grid gap-4 lg:grid-cols-2">
+              {applications.map((a) => (
+                <div key={a.id} className="glass-card p-5" data-testid={`application-row-${a.id}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-display text-lg font-bold text-slate-100">{a.name}</p>
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+                        <span className="flex items-center gap-1.5"><Phone size={12} className="text-royal" /> {a.phone}</span>
+                        <span className="flex items-center gap-1.5"><MapPin size={12} className="text-royal" /> {a.city || "—"}</span>
+                        <span className="flex items-center gap-1.5"><Briefcase size={12} className="text-royal" /> {a.profession || "—"}</span>
+                      </div>
+                    </div>
+                    <span
+                      className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${
+                        a.status === "new" ? "bg-emerald-500/90 text-black" : "border border-royal/30 text-slate-400"
+                      }`}
+                      data-testid={`application-status-${a.id}`}
+                    >
+                      {a.status}
+                    </span>
+                  </div>
+                  <div className="mt-4 rounded-lg border border-royal/15 bg-black/30 p-4">
+                    <p className="eyebrow !text-[10px]">Why Rotary?</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-300">{a.why_rotary || "—"}</p>
+                  </div>
+                  <div className="mt-4 flex items-center gap-2">
+                    {a.status === "new" && (
+                      <button
+                        onClick={() => mutate(() => api.post(`/applications/${a.id}/review`), "Marked as reviewed")}
+                        className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/10"
+                        data-testid={`application-review-${a.id}`}
+                      >
+                        Mark Reviewed
+                      </button>
+                    )}
+                    <span className="ml-auto font-mono text-[10px] text-slate-500">
+                      {dayjs(a.created_at).format("DD MMM YYYY")}
+                    </span>
+                    <DeleteButton testId={`application-delete-${a.id}`} onConfirm={() => mutate(() => api.delete(`/applications/${a.id}`), "Application removed")} />
                   </div>
                 </div>
               ))}
