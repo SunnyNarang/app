@@ -401,15 +401,15 @@ const Leadership = () => (
 );
 
 const Gallery = () => {
-  const [projects, setProjects] = useState([]);
+  const [items, setItems] = useState([]);
   useEffect(() => {
     api
-      .get("/projects")
-      .then(({ data }) => setProjects(data.filter((p) => p.image_url)))
-      .catch(() => setProjects([]));
+      .get("/gallery")
+      .then(({ data }) => setItems(data))
+      .catch(() => setItems([]));
   }, []);
 
-  if (projects.length === 0) return null;
+  if (items.length === 0) return null;
 
   const spanFor = (i) =>
     i === 0 ? "col-span-2 row-span-2" : i === 3 || i === 5 ? "col-span-2" : "";
@@ -423,29 +423,27 @@ const Gallery = () => {
         </h2>
       </Reveal>
       <div className="mt-12 grid auto-rows-[150px] grid-flow-dense grid-cols-2 gap-4 sm:auto-rows-[190px] md:grid-cols-4">
-        {projects.slice(0, 6).map((p, i) => (
-          <Reveal key={p.id} delay={i * 0.06} className={spanFor(i)}>
+        {items.slice(0, 6).map((g, i) => (
+          <Reveal key={g.id} delay={i * 0.06} className={spanFor(i)}>
             <figure className="group relative h-full w-full overflow-hidden rounded-xl border border-royal/20">
               <img
-                src={photoSrcOf(p.image_url)}
-                alt={p.title}
+                src={photoSrcOf(g.image_url)}
+                alt={g.caption || "Gallery moment"}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
                 data-testid={`gallery-photo-${i}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-              <figcaption className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-sm font-bold text-slate-100">{p.title}</p>
-                <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-royal-light">{p.category}</p>
-                {p.caption && (i === 0 || i === 3 || i === 5) && (
+              {g.caption && (i === 0 || i === 3 || i === 5) && (
+                <figcaption className="absolute bottom-0 left-0 right-0 p-4">
                   <p
-                    className="mt-2 line-clamp-2 border-l-2 border-royal/60 pl-3 text-[11px] leading-relaxed text-slate-300 sm:text-xs"
+                    className="line-clamp-2 border-l-2 border-royal/60 pl-3 text-[11px] leading-relaxed text-slate-200 sm:text-sm"
                     data-testid={`gallery-caption-${i}`}
                   >
-                    {p.caption}
+                    {g.caption}
                   </p>
-                )}
-              </figcaption>
+                </figcaption>
+              )}
             </figure>
           </Reveal>
         ))}

@@ -2,19 +2,20 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound,
+  Users, CalendarDays, HeartHandshake, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard, KeyRound, Image as ImageIcon,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { api, formatApiErrorDetail } from "../lib/api";
 import { Reveal } from "../components/Reveal";
 import ChangePasswordModal from "../components/ChangePasswordModal";
-import PhotoUpload from "../components/PhotoUpload";
+import PhotoUpload, { photoSrcOf } from "../components/PhotoUpload";
 import { Avatar } from "./Members";
 
 const TABS = [
   { id: "members", label: "Members", icon: Users },
   { id: "meetings", label: "Meetings & Schedule", icon: CalendarDays },
   { id: "projects", label: "Service Projects", icon: HeartHandshake },
+  { id: "gallery", label: "Gallery", icon: ImageIcon },
 ];
 
 const Field = ({ label, children }) => (
@@ -92,19 +93,23 @@ export default function Admin() {
   const [memberForm, setMemberForm] = useState(null);
   const [meetingForm, setMeetingForm] = useState(null);
   const [projectForm, setProjectForm] = useState(null);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [galleryForm, setGalleryForm] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const loadAll = async () => {
-    const [s, m, mt, p] = await Promise.all([
+    const [s, m, mt, p, g] = await Promise.all([
       api.get("/admin/stats"),
       api.get("/members"),
       api.get("/meetings"),
       api.get("/projects"),
+      api.get("/gallery"),
     ]);
     setStats(s.data);
     setMembers(m.data);
     setMeetings(mt.data);
     setProjects(p.data);
+    setGalleryItems(g.data);
   };
 
   useEffect(() => {
@@ -165,6 +170,22 @@ export default function Admin() {
     ).finally(() => {
       setSaving(false);
       setProjectForm(null);
+    });
+  };
+
+  const saveGallery = (e) => {
+    e.preventDefault();
+    if (!galleryForm.image_url) {
+      toast.error("Please upload a photo first");
+      return;
+    }
+    setSaving(true);
+    mutate(
+      () => (galleryForm.id ? api.put(`/gallery/${galleryForm.id}`, galleryForm) : api.post("/gallery", galleryForm)),
+      galleryForm.id ? "Gallery photo updated" : "Added to gallery"
+    ).finally(() => {
+      setSaving(false);
+      setGalleryForm(null);
     });
   };
 
@@ -354,6 +375,39 @@ export default function Admin() {
             </div>
           </section>
         )}
+
+        {tab === "gallery" && (
+          <section className="mt-8">
+            <div className="mb-6 flex justify-end">
+              <button onClick={() => setGalleryForm({ caption: "", image_url: "" })} className="btn-royal !px-4 !py-2.5 !text-xs" data-testid="admin-add-gallery-button">
+                <Plus size={15} /> Add Gallery Photo
+              </button>
+            </div>
+            {galleryItems.length === 0 && (
+              <p className="text-sm text-slate-400" data-testid="admin-gallery-empty-hint">
+                No gallery photos yet — add your first moment for the home page.
+              </p>
+            )}
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {galleryItems.map((g) => (
+                <div key={g.id} className="glass-card overflow-hidden" data-testid={`admin-gallery-row-${g.id}`}>
+                  <img src={photoSrcOf(g.image_url)} alt={g.caption || "Gallery photo"} className="h-40 w-full object-cover" />
+                  <div className="p-4">
+                    <p className="line-clamp-2 min-h-[2.5rem] text-xs leading-relaxed text-slate-300">
+                      {g.caption || <span className="text-slate-500">No caption</span>}
+                    </p>
+                    <div className="mt-3 flex gap-2">
+                      <button onClick={() => setGalleryForm({ ...g })} className="inline-flex items-center gap-1 rounded-lg border border-royal/25 px-3 py-1.5 text-xs font-semibold text-royal-light hover:border-royal hover:bg-royal/10" data-testid={`admin-edit-gallery-${g.id}`}>
+                        <Pencil size={13} /> Edit
+                      </button>
+                      <DeleteButton testId={`admin-delete-gallery-${g.id}`} onConfirm={() => mutate(() => api.delete(`/gallery/${g.id}`), "Gallery photo removed")} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {pwOpen && <ChangePasswordModal onClose={() => setPwOpen(false)} />}
@@ -471,11 +525,6 @@ export default function Admin() {
                     testIdPrefix="project-photo-upload"
                   />
                 </div>
-                <div className="sm:col-span-2">
-                  <Field label="Gallery Caption (one-line story)">
-                    <input className="input-dark" value={projectForm.caption} onChange={(e) => setProjectForm({ ...projectForm, caption: e.target.value })} placeholder="e.g. 60 volunteers, 12 tonnes of waste, one proud morning" data-testid="project-form-caption" />
-                  </Field>
-                </div>
                 <Field label="Volunteers"><input type="number" className="input-dark" value={projectForm.volunteers} onChange={(e) => setProjectForm({ ...projectForm, volunteers: e.target.value })} data-testid="project-form-volunteers" /></Field>
                 <Field label="Service Hours"><input type="number" className="input-dark" value={projectForm.hours} onChange={(e) => setProjectForm({ ...projectForm, hours: e.target.value })} data-testid="project-form-hours" /></Field>
                 <Field label="Lives Impacted"><input type="number" className="input-dark" value={projectForm.lives_impacted} onChange={(e) => setProjectForm({ ...projectForm, lives_impacted: e.target.value })} data-testid="project-form-lives" /></Field>
@@ -484,6 +533,27 @@ export default function Admin() {
               <button type="submit" disabled={saving} className="btn-royal w-full" data-testid="project-form-submit">
                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
                 {projectForm.id ? "Save Changes" : "Add Project"}
+              </button>
+            </form>
+          </Modal>
+        )}
+
+        {galleryForm && (
+          <Modal title={galleryForm.id ? "Edit Gallery Photo" : "Add Gallery Photo"} onClose={() => setGalleryForm(null)}>
+            <form onSubmit={saveGallery} className="space-y-4" data-testid="gallery-form">
+              <div className="rounded-lg border border-royal/15 bg-black/30 p-4" data-testid="gallery-photo-upload-section">
+                <PhotoUpload
+                  value={galleryForm.image_url}
+                  onChange={(url) => setGalleryForm({ ...galleryForm, image_url: url })}
+                  testIdPrefix="gallery-photo-upload"
+                />
+              </div>
+              <Field label="Caption (one-line story)">
+                <input className="input-dark" value={galleryForm.caption} onChange={(e) => setGalleryForm({ ...galleryForm, caption: e.target.value })} placeholder="e.g. 60 volunteers, one proud morning at the fort" data-testid="gallery-form-caption" />
+              </Field>
+              <button type="submit" disabled={saving} className="btn-royal w-full" data-testid="gallery-form-submit">
+                {saving ? <Loader2 size={16} className="animate-spin" /> : null}
+                {galleryForm.id ? "Save Changes" : "Add to Gallery"}
               </button>
             </form>
           </Modal>

@@ -644,6 +644,52 @@ async def delete_project(project_id: str):
     return {"ok": True}
 
 
+# ---- Gallery (Moments — separate from projects) ----
+
+class GalleryItem(BaseDocument):
+    caption: str = ""
+    image_url: str = ""
+    created_at: str = Field(default_factory=iso_now)
+
+
+@api_router.get("/gallery")
+async def list_gallery():
+    docs = await db.gallery.find().sort("created_at", -1).to_list(200)
+    return [doc_out(d) for d in docs]
+
+
+@api_router.post("/gallery", dependencies=[Depends(require_admin)])
+async def create_gallery_item(item: GalleryItem):
+    if not item.image_url:
+        raise HTTPException(status_code=422, detail="Please upload a photo for the gallery item")
+    doc = item.to_mongo()
+    res = await db.gallery.insert_one(doc)
+    doc["_id"] = res.inserted_id
+    return doc_out(doc)
+
+
+@api_router.put("/gallery/{item_id}", dependencies=[Depends(require_admin)])
+async def update_gallery_item(item_id: str, item: GalleryItem):
+    old = await db.gallery.find_one({"_id": to_oid(item_id)})
+    if not old:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    await maybe_release_photo(old.get("image_url"), item.image_url)
+    update = item.to_mongo()
+    update.pop("created_at", None)
+    res = await db.gallery.find_one_and_update({"_id": to_oid(item_id)}, {"$set": update}, return_document=True)
+    return doc_out(res)
+
+
+@api_router.delete("/gallery/{item_id}", dependencies=[Depends(require_admin)])
+async def delete_gallery_item(item_id: str):
+    old = await db.gallery.find_one({"_id": to_oid(item_id)})
+    if not old:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    await maybe_release_photo(old.get("image_url"), "")
+    await db.gallery.delete_one({"_id": to_oid(item_id)})
+    return {"ok": True}
+
+
 # ---- Admin stats ----
 
 @api_router.get("/admin/stats", dependencies=[Depends(require_admin)])
