@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 240 9% 5%;
+        --foreground: 210 40% 98%;
+        --card: 227 26% 10%;
+        --card-foreground: 210 40% 98%;
+        --popover: 227 26% 8%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 45 62% 52%;
+        --primary-foreground: 240 9% 5%;
+        --secondary: 227 20% 15%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 227 20% 15%;
+        --muted-foreground: 215 20% 65%;
+        --accent: 227 20% 15%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 45 62% 52% / 0.16;
+        --input: 45 62% 52% / 0.22;
+        --ring: 45 62% 52%;
+        --radius: 0.75rem;
+    }
+
+    * {
+        @apply border-border;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-[#0B0C10] text-slate-100 font-sans antialiased;
+        margin: 0;
+    }
+
+    ::selection {
+        @apply bg-gold/80 text-black;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0B0C10;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #2a2d3a;
+        border-radius: 8px;
+        border: 2px solid #0B0C10;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #D4AF37;
+    }
+}
+
+@layer components {
+    .eyebrow {
+        @apply text-xs uppercase tracking-[0.28em] text-gold font-semibold font-mono;
+    }
+
+    .gold-text {
+        @apply bg-clip-text text-transparent;
+        background-image: linear-gradient(120deg, #F3E5AB 0%, #D4AF37 45%, #B8860B 70%, #F3E5AB 100%);
+        background-size: 200% auto;
+    }
+
+    .btn-gold {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold text-black
+               bg-gradient-to-r from-[#F3E5AB] via-[#D4AF37] to-[#B8860B] bg-[length:200%_auto]
+               shadow-[0_0_24px_rgba(212,175,55,0.25)] transition-all duration-300
+               hover:shadow-[0_0_36px_rgba(212,175,55,0.45)] hover:scale-[1.03] active:scale-[0.98]
+               animate-gold-pan disabled:opacity-50 disabled:pointer-events-none;
+    }
+
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-gold-light
+               border border-gold/30 transition-all duration-300 hover:border-gold/70 hover:bg-gold/10 hover:scale-[1.02] active:scale-[0.98];
+    }
+
+    .glass-card {
+        @apply rounded-xl border border-gold/[0.16] bg-panel/90 backdrop-blur-md
+               transition-all duration-300
+               hover:border-gold/50 hover:shadow-[0_10px_40px_rgba(212,175,55,0.12)];
+    }
+
+    .input-dark {
+        @apply w-full rounded-lg border border-gold/20 bg-black/40 px-4 py-3 text-sm text-slate-100
+               placeholder:text-slate-500 outline-none transition-all duration-300
+               focus:border-gold/60 focus:ring-2 focus:ring-gold/20;
+    }
+
+    .grain::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.5;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+}

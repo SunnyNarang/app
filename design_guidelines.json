@@ -1,0 +1,162 @@
+{
+  "project_name": "Rotary Club of Gwalior Innovators",
+  "design_direction": "Modern Dark Theme with Regal Gold Accents & High-End Transitions",
+  "theme_mode": "dark",
+  "context": "Community Service & Professional Club Portal (Gwalior, India)",
+  "typography": {
+    "heading_font": {
+      "family": "Cinzel, Cormorant Garamond, serif",
+      "import_url": "https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap",
+      "usage": "H1, H2, Section titles, Hero headers, Award titles. Strictly NO Inter or Roboto for headings!"
+    },
+    "body_font": {
+      "family": "'Plus Jakarta Sans', sans-serif",
+      "usage": "Body copy, member biodata details, admin forms, badges, metadata"
+    },
+    "accent_font": {
+      "family": "'JetBrains Mono', monospace",
+      "usage": "Data stats, member IDs, timestamps, badge codes"
+    },
+    "scale": {
+      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight",
+      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight",
+      "h3_card": "text-xl sm:text-2xl font-semibold",
+      "body_base": "text-base leading-relaxed text-slate-300",
+      "label_eyebrow": "text-xs uppercase tracking-[0.25em] text-[#D4AF37] font-semibold"
+    }
+  },
+  "colors": {
+    "background_main": "#0B0C10",
+    "background_card": "#131620",
+    "background_card_hover": "#1A1E2C",
+    "surface_border": "rgba(212, 175, 55, 0.18)",
+    "surface_border_active": "rgba(212, 175, 55, 0.5)",
+    "gold_primary": "#D4AF37",
+    "gold_light": "#F3E5AB",
+    "gold_dark": "#996515",
+    "gold_gradient": "linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #996515 100%)",
+    "text_primary": "#F8FAFC",
+    "text_secondary": "#94A3B8",
+    "text_muted": "#64748B",
+    "accent_crimson": "#E11D48",
+    "accent_emerald": "#10B981",
+    "accent_blue": "#3B82F6",
+    "tinted_grey": "#1E2230"
+  },
+  "surfaces_and_effects": {
+    "header_nav": "backdrop-blur-xl bg-[#0B0C10]/80 border-b border-[#D4AF37]/20 sticky top-0 z-50",
+    "glass_card": "backdrop-blur-md bg-[#131620]/90 border border-[#D4AF37]/20 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 hover:border-[#D4AF37]/50 hover:shadow-[0_10px_35px_rgba(212,175,55,0.15)]",
+    "gold_glow_button": "bg-gradient-to-r from-[#D4AF37] via-[#E5C158] to-[#B8860B] text-black font-semibold rounded-lg px-6 py-3 shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-[1.02] transition-all duration-300",
+    "privacy_blur_overlay": "backdrop-blur-md bg-black/60 border border-[#D4AF37]/30 rounded-lg p-4 flex flex-col items-center justify-center text-center text-[#F3E5AB]"
+  },
+  "image_urls": {
+    "hero_background": "https://images.unsplash.com/photo-1643269877099-ea5393b80320?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "gwalior_fort_heritage": "https://images.unsplash.com/photo-1773846012618-0d05a562d792?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "community_education": "https://images.unsplash.com/photo-1569173675610-42c361a86e37?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "community_children": "https://images.unsplash.com/photo-1524069290683-0457abfe42c3?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "volunteers_service": "https://images.unsplash.com/photo-1560220604-1985ebfe28b1?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "member_portraits": [
+      {
+        "name": "Rtn. Er. Alok Sharma",
+        "role": "Club President (2025-26)",
+        "url": "https://images.unsplash.com/photo-1771244670407-42e9585ab333?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      {
+        "name": "Rtn. Dr. Sunita Raj",
+        "role": "Club Secretary & Medical Lead",
+        "url": "https://images.unsplash.com/photo-1770627000564-3feb36aecbcd?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      {
+        "name": "Rtn. Vikrant Agarwal",
+        "role": "Treasurer & Youth Director",
+        "url": "https://images.unsplash.com/photo-1771244678811-50c22f17c791?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      {
+        "name": "Rtn. Rajesh Soni",
+        "role": "Community Service Chair",
+        "url": "https://images.unsplash.com/photo-1771244688590-1e481dba1b5a?crop=entropy&cs=srgb&fm=jpg&q=85"
+      }
+    ]
+  },
+  "pages_architecture": [
+    {
+      "page_name": "Home Page (/)",
+      "sections": [
+        "Navigation Bar: Logo with rotary wheel motif, Links (Home, Members, Service Projects, Meetings, About Us), Login/Dashboard CTA, Mobile Drawer Menu",
+        "Hero Section: Parallax Gwalior heritage backdrop with subtle dark vignette gradient (from-black/80 via-black/60 to-[#0B0C10]), Gold accent badge 'ROTARY DISTRICT 3053 | GWALIOR INNOVATORS', Bold Cinzel heading, Mission statement, Action CTA 'Explore Our Impact' & 'View Members Directory'",
+        "Editorial Marquee Ribbon: Slow sliding gold-bordered marquee with keywords: 'SERVICE ABOVE SELF • INNOVATION IN COMMUNITY • HEALTHCARE DRIVE • GIRL CHILD EDUCATION • CLEAN GWALIOR INITIATIVE • YOUTH FELLOWSHIP'",
+        "Service Areas Grid (Bento Tetris Layout): Highlighting 4 core pillars: (1) Medical & Health Camps, (2) Literacy & STEM Education, (3) Eco-Gwalior Plantation, (4) Vocational & Women Empowerment. Each with gold icon, stats, and learn more trigger",
+        "Impact Counters & Stats Section: Animated counting numbers (e.g., 25,000+ Lives Touched, 140+ Projects Completed, ₹1.2 Cr Community Investment, 85 Active Innovators)",
+        "Upcoming Schedule & Meetings Preview: Next Rotary Weekly Fellowship Card (Date, Venue, Speaker, Topic, RSVP button) + Calendar list of upcoming events",
+        "Leadership Spotlight Carousel: President message & key executive members with interactive cards",
+        "Footer: Dark velvet footer with large gold Rotary Emblem watermark, quick links, contact info, meeting venue address (Gwalior Club / Taj Usha Kiran Palace), social links, copyright"
+      ]
+    },
+    {
+      "page_name": "Members Page (/members)",
+      "sections": [
+        "Header Banner: Gold ambient hero banner 'DISTINGUISHED FELLOWS & INNOVATORS'",
+        "Filter & Search Bar: Instant search input by name, classification, company, or leadership role + Filter tabs (All, Board Members, Past Presidents, Paul Harris Fellows)",
+        "Members Grid / List Toggle: Grid view with high-end dark cards + List view for quick directory lookups",
+        "Member Card Specs: Member photo with gold subtle ring avatar, full name, Rotary classification (e.g. 'Civil Engineering', 'Cardiology', 'Jewelry Manufacturing'), Business Name, Badge 'Logged-in members see full contact details'",
+        "Member Biodata Modal / Full Page Drawer: Opens when clicking any member card. Contains: (1) Public Profile: Name, Classification, Bio, Rotary History, Committees, Social links. (2) Privacy-Protected Section: Phone Number, Email, Residential Address, Birthday, Anniversary Date, Spouse Name. GUEST STATE: Blurry frosted container with gold padlock icon, message 'Login as Rotary Member to unlock confidential directory data', quick 'Login Now' button. LOGGED-IN STATE: Cleanly revealed animated gold-accent card with direct call, email, and WhatsApp buttons."
+      ]
+    },
+    {
+      "page_name": "Login Page (/login)",
+      "sections": [
+        "Centred Dark Glass Login Card with gold border beam effect",
+        "Header: Rotary Wheel Gold Icon + 'Member & Admin Portal'",
+        "Form Fields: Email input, Password input, 'Remember Me' checkbox",
+        "Role Toggle / Demo Credentials Helper Box: Quick click-to-fill demo accounts: [Member Demo: member@rotarygwalior.org / member123] and [Admin Demo: admin@rotarygwalior.org / admin123] for rapid evaluation",
+        "CTA Button: Gold Glow Submit button with loading spinner state"
+      ]
+    },
+    {
+      "page_name": "Admin Panel (/admin)",
+      "sections": [
+        "Protected Route: Redirects to /login if not authenticated as Admin",
+        "Admin Sidebar / Top Navigation: Dashboard Stats summary, Members Management, Meetings & Schedule, Community Projects",
+        "Member Management Tab: Searchable data table with member records, 'Add New Member' modal, 'Edit Member' drawer, ability to toggle privacy flags, change member status",
+        "Meetings Management Tab: Create new Rotary fellowship meeting, set speaker, agenda, venue, time, manage member RSVPs",
+        "Events & Projects Tab: Track active community projects, record volunteer hours, upload project photos and impact metrics",
+        "Toast notifications via Sonner for all CRUD actions (Created, Updated, Deleted successfully)"
+      ]
+    }
+  ],
+  "motion_and_interactions": {
+    "framer_motion": "Use framer-motion for smooth entrance animations on all sections: initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}",
+    "lenis_scroll": "Incorporate smooth scrolling for ultra-fluid page navigation",
+    "privacy_unlock_animation": "Animate backdrop filter blur reduction from blur-md to blur-0 and opacity transition when member logs in",
+    "card_hover": "Hover effects should scale cards slightly (scale-102), elevate border brightness from 20% gold to 50% gold, and display inner subtle gold radial gradient light"
+  },
+  "testing_attributes": {
+    "rule": "ALL interactive components, inputs, buttons, navigation links, tabs, and member biodata fields MUST include kebab-case `data-testid` attributes.",
+    "examples": [
+      "data-testid=\"nav-home-link\"",
+      "data-testid=\"nav-members-link\"",
+      "data-testid=\"nav-login-button\"",
+      "data-testid=\"hero-explore-button\"",
+      "data-testid=\"member-card-alok-sharma\"",
+      "data-testid=\"member-biodata-modal\"",
+      "data-testid=\"biodata-phone-locked\"",
+      "data-testid=\"biodata-phone-unlocked\"",
+      "data-testid=\"login-email-input\"",
+      "data-testid=\"login-password-input\"",
+      "data-testid=\"login-submit-button\"",
+      "data-testid=\"demo-member-login-button\"",
+      "data-testid=\"demo-admin-login-button\"",
+      "data-testid=\"admin-tab-members\"",
+      "data-testid=\"admin-tab-meetings\"",
+      "data-testid=\"admin-add-member-button\""
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Ensure `Cinzel` and `Plus Jakarta Sans` fonts are imported in index.html or index.css.",
+    "Ensure all pages are fully responsive across mobile, tablet, and desktop viewports.",
+    "Never use plain white or default unstyled components. Gold accents should be applied with sophistication (buttons, badges, borders, icons, progress indicators).",
+    "The login state must be persistent (e.g. stored in localStorage / React Context) so logging in immediately reveals the locked biodata on the Members page.",
+    "Implement mock API / state handling for Admin operations (Add/Edit Member, Add Meeting) so the user can interactively test the panel.",
+    "Always include `data-testid` on interactive elements as specified in testing_attributes."
+  ]
+}
